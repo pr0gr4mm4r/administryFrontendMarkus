@@ -1,0 +1,8 @@
+<ng-container *ngIf="gegenstandList">
+  <div *ngFor="let gegenstand of gegenstandList">
+    <li>
+      {{gegenstand.name}}{{gegenstand.fach.fachId}}{{gegenstand.fach.name}}
+    </li>
+
+  </div>
+</ng-container>
