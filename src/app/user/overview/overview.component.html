@@ -1,8 +1,28 @@
-<ng-container *ngIf="gegenstandList">
-  <div *ngFor="let gegenstand of gegenstandList">
-    <li>
-      {{gegenstand.name}}{{gegenstand.fach.fachId}}{{gegenstand.fach.name}}
-    </li>
+<!--<ng-container *ngIf="fachList">
+  <table>
+    <tr *ngFor="let fach of fachList">
+      <td>
+        {{fach.name}}
+      </td>
+      <td>
+        <table>
+          <tr>
+            <td *ngFor="let gegenstand of fach?.gegenstandList">
+              {{gegenstand.name}}
+            </td>
+          </tr>
+        </table>
+      </td>
+    </tr>
+  </table>
+</ng-container>-->
+<div id="test">
 
-  </div>
-</ng-container>
+</div>
+<!--
+<td>
+  <mat-icon>border_color</mat-icon>
+</td>
+<td>
+  <mat-icon>delete</mat-icon>
+</td>-->

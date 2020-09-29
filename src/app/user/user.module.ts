@@ -5,6 +5,7 @@ import {SearchComponent} from "./search/search.component";
 import {UiModule} from "../ui/ui.module";
 import {AppRoutingModule} from "../app-routing.module";
 import {SharedModule} from "../shared/shared.module";
+import {FormsModule} from "@angular/forms";
 
 
 @NgModule({
@@ -13,7 +14,8 @@ import {SharedModule} from "../shared/shared.module";
     AppRoutingModule,
     CommonModule,
     UiModule,
-    SharedModule
+    SharedModule,
+    FormsModule
   ]
 })
 export class UserModule {

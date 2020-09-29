@@ -10,7 +10,7 @@ import {Gegenstand} from "../../model/gegenstand/gegenstand";
 })
 export class GegenstandService {
 
-  constructor(private http: HttpClient, private route: Router) { }
+  constructor(private http: HttpClient) { }
 
   add(gegenstand): Observable<Gegenstand> {
     return this.http.post<Gegenstand>(environment.apiUrl + '/gegenstand/add/', gegenstand);

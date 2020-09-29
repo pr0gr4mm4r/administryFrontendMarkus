@@ -8,6 +8,7 @@ import {UserModule} from "./user/user.module";
 import {BrowserAnimationsModule} from "@angular/platform-browser/animations";
 import {AdminModule} from "./admin/admin.module";
 import {GegenstandService} from "./services/gegenstand/gegenstand.service";
+import {FachService} from "./services/fach/fach.service";
 
 @NgModule({
   declarations: [
@@ -21,7 +22,7 @@ import {GegenstandService} from "./services/gegenstand/gegenstand.service";
     UiModule,
     AdminModule
   ],
-  providers: [GegenstandService],
+  providers: [GegenstandService, FachService],
   bootstrap: [AppComponent]
 })
 export class AppModule { }

@@ -8,6 +8,7 @@ import {MatFormFieldModule} from "@angular/material/form-field";
 import {MatAutocompleteModule} from "@angular/material/autocomplete";
 import {MatTabsModule} from "@angular/material/tabs";
 import {MatMenuModule} from "@angular/material/menu";
+import {MatIconModule} from "@angular/material/icon";
 
 
 @NgModule({
@@ -22,7 +23,8 @@ import {MatMenuModule} from "@angular/material/menu";
     MatAutocompleteModule,
     ReactiveFormsModule,
     MatTabsModule,
-    MatMenuModule
+    MatMenuModule,
+    MatIconModule
   ]
 })
 export class SharedModule {
