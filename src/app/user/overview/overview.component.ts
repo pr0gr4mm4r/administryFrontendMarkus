@@ -16,24 +16,14 @@ export class OverviewComponent implements OnInit {
               private fachService: FachService) {
   }
 
-  /*gegenstandList: Gegenstand[] = [];*/
   fachList: Fach[] = [];
 
   ngOnInit(): void {
-    /*this.retrieveGegenstandList();*/
     this.fachList.forEach(fach => fach.gegenstandList = []);
     this.retrieveFachList();
-    if(this.fachList){
-    for (let i = 0; i < this.fachList.length; i++) {
-      setTimeout($('#test').append('<div>hello</div>'),10);
-    }
   }
 
   retrieveFachList() {
     this.fachService.retrieve().subscribe(response => this.fachList = response);
   }
-
-  /*retrieveGegenstandList() {
-    this.gegenstandService.retrieve().subscribe(response => this.gegenstandList = response);
-  }*/
 }

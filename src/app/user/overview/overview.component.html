@@ -1,5 +1,39 @@
-<!--<ng-container *ngIf="fachList">
-  <table>
+<ng-container *ngIf="fachList">
+
+</ng-container>
+
+<div *ngFor="let fach of fachList" style="display: inline-block; float: left;
+      margin-top: 50px; margin-left: 80px; width: 350px; background-color: #ffa238;
+       border: 3px solid black; text-align: center">
+  <div style="border: 3px solid black; margin:3px; width: 96%;"><h4>Fachnummer:&nbsp;{{fach.name}}</h4></div>
+  <div *ngFor="let gegenstand of fach?.gegenstandList"
+       style="padding: 3px">
+    {{gegenstand.name}}
+  </div>
+
+  <div style="width:50%; margin-top:5px; text-align: center; display: inline-block;">
+    <div>
+      add
+    </div>
+  </div>
+  <div style="width:50%; margin-top:5px; text-align: center; display: inline-block;">
+    <div>
+      delete
+    </div>
+  </div>
+
+
+</div>
+<!--
+<td>
+  <mat-icon>border_color</mat-icon>
+</td>
+<td>
+  <mat-icon>delete</mat-icon>
+</td>
+
+
+<table>
     <tr *ngFor="let fach of fachList">
       <td>
         {{fach.name}}
@@ -15,14 +49,4 @@
       </td>
     </tr>
   </table>
-</ng-container>-->
-<div id="test">
-
-</div>
-<!--
-<td>
-  <mat-icon>border_color</mat-icon>
-</td>
-<td>
-  <mat-icon>delete</mat-icon>
-</td>-->
+-->
