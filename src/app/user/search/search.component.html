@@ -1,8 +1,8 @@
 <div style="text-align: center; margin: 100px">
   <div>
-    <ng-container *ngIf="aktuelleGeg">
+    <ng-container *ngIf="aktuelleGegenstandFachStringList">
       <mat-form-field [style.width.px]=500>
-        <input matInput autocomplete="off" (focus)="updateAktuelleGeg()"
+        <input matInput autocomplete="off" (input)="updateAktuelleGeg()"
                id="formCategory" [(ngModel)]="suche"
                name="formCategory" type="text" placeholder="Suche Gegenstand" [formControl]="myControl"
                [matAutocomplete]="auto">

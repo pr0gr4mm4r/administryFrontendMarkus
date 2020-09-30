@@ -1,1 +1,19 @@
+.addOrDeleteDiv{
+  width:50%;
+  margin-top:5px;
+  text-align: center;
+  display: inline-block;
+}
 
+.addOrDeleteDiv:hover{
+  cursor: pointer;
+}
+#addDiv:hover{
+  background-color: mediumspringgreen;
+}
+#deleteDiv:hover{
+  background-color: orangered;
+}
+.gegenstandHoverDiv:hover{
+  cursor: pointer;
+}

@@ -11,19 +11,39 @@ declare var $;
   styleUrls: ['./overview.component.css']
 })
 export class OverviewComponent implements OnInit {
+  addDialogBool: boolean;
 
   constructor(private gegenstandService: GegenstandService,
               private fachService: FachService) {
   }
 
   fachList: Fach[] = [];
+  currentFachIndex: number = 0;
 
   ngOnInit(): void {
-    this.fachList.forEach(fach => fach.gegenstandList = []);
     this.retrieveFachList();
   }
 
   retrieveFachList() {
     this.fachService.retrieve().subscribe(response => this.fachList = response);
+  }
+
+  activateModal() {
+    $('#modal').modal();
+  }
+
+  openAddDialog() {
+    this.addDialogBool = true;
+    this.activateModal();
+  }
+
+  openDeleteDialog(fachIndex: number) {
+    this.addDialogBool = false;
+    this.currentFachIndex = fachIndex;
+    this.activateModal();
+  }
+
+  deleteGegenstand(i: number) {
+    this.gegenstandService.delete(i).subscribe();
   }
 }

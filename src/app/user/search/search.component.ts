@@ -1,9 +1,9 @@
 import {Component, OnInit} from '@angular/core';
-import {GegenstandService} from "../../services/gegenstand/gegenstand.service";
-import {Gegenstand} from "../../model/gegenstand/gegenstand";
 import {Observable} from "rxjs";
 import {FormControl} from "@angular/forms";
 import {map, startWith} from "rxjs/operators";
+import {Fach} from "../../model/fach/fach";
+import {FachService} from "../../services/fach/fach.service";
 
 @Component({
   selector: 'app-search',
@@ -13,31 +13,48 @@ import {map, startWith} from "rxjs/operators";
 export class SearchComponent implements OnInit {
 
   suche: String = "";
-  alleGeg: Gegenstand[] = [];
-  aktuelleGeg: string[] = [];
+  fachList: Fach[] = [];
+  aktuelleGegenstandFachStringList: string[] = [];
   filteredOptions: Observable<string[]>;
   myControl = new FormControl();
 
-  constructor(private gegenstandService: GegenstandService) {
+  constructor(private fachService: FachService) {
   }
 
   ngOnInit(): void {
-    this.gegenstandService.retrieve().subscribe(data=> this.alleGeg = data);
-    this.aktuelleGeg = [];
+    this.fachService.retrieve().subscribe(data => {
+      this.fachList = data;
+      for (let i = 0; i < this.fachList.length; i++) {
+        for (let j = 0; j < this.fachList[i].gegenstandList.length; j++) {
+          this.aktuelleGegenstandFachStringList.push(
+            this.fachList[i].gegenstandList[j].name + " [ " + this.fachList[i].name + " ]");
+        }
+      }
+    });
+
     this.filteredOptions = this.myControl.valueChanges.pipe(
       startWith(''),
-      map(value => this._filter(value))
+      map(() => this.aktuelleGegenstandFachStringList.filter(
+        gegenstand => gegenstand.includes(this.suche.toString()))
+      )
     );
   }
 
   updateAktuelleGeg() {
-    this.aktuelleGeg = this.alleGeg.filter(gegenstand=>gegenstand.name.
-    includes(this.suche.toString())).
-    map(object=>object.name.toString() + " (Fachnummer: " + object.fach.name + ")");
-  }
-
-  _filter(value: String): string[] {
-    const filterValue = value.toLowerCase();
-    return this.aktuelleGeg.filter(option => option.toLowerCase().includes(filterValue));
+    for (let i = 0; i < this.aktuelleGegenstandFachStringList.length; i++) {
+      const gegenstand = this.aktuelleGegenstandFachStringList[i];
+      if (gegenstand.startsWith(this.suche[0])) {
+        const currentGegenstand = gegenstand;
+        this.aktuelleGegenstandFachStringList.splice(i, 1);
+        this.aktuelleGegenstandFachStringList.unshift(currentGegenstand);
+      }
+    }
+    this.filteredOptions = this.myControl.valueChanges.pipe(
+      startWith(''),
+      map(value => this.aktuelleGegenstandFachStringList.filter(
+        gegenstand => gegenstand.toLocaleLowerCase().toString().includes(this.suche.toLocaleLowerCase().toString())
+        )
+      )
+    );
   }
 }

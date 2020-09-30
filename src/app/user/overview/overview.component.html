@@ -1,52 +1,46 @@
-<ng-container *ngIf="fachList">
-
-</ng-container>
-
-<div *ngFor="let fach of fachList" style="display: inline-block; float: left;
-      margin-top: 50px; margin-left: 80px; width: 350px; background-color: #ffa238;
+<div *ngFor="let fach of fachList, let fachIndex = index" style="display: inline-block; float: left;
+      margin-top: 50px; margin-left: 80px; width: 350px; background-color: #ebebeb;
        border: 3px solid black; text-align: center">
-  <div style="border: 3px solid black; margin:3px; width: 96%;"><h4>Fachnummer:&nbsp;{{fach.name}}</h4></div>
+  <div style="border: 3px solid black; margin:3px; width: 96%;"><h4>Fach&nbsp;{{fach.name}}</h4></div>
   <div *ngFor="let gegenstand of fach?.gegenstandList"
        style="padding: 3px">
     {{gegenstand.name}}
   </div>
 
-  <div style="width:50%; margin-top:5px; text-align: center; display: inline-block;">
+  <div (click)="openAddDialog()" id="addDiv" class="addOrDeleteDiv">
     <div>
-      add
+      <mat-icon>add</mat-icon>
     </div>
   </div>
-  <div style="width:50%; margin-top:5px; text-align: center; display: inline-block;">
+  <div (click)="openDeleteDialog(fachIndex)" id="deleteDiv" class="addOrDeleteDiv">
     <div>
-      delete
+      <mat-icon>delete</mat-icon>
     </div>
   </div>
-
-
 </div>
-<!--
-<td>
-  <mat-icon>border_color</mat-icon>
-</td>
-<td>
-  <mat-icon>delete</mat-icon>
-</td>
 
-
-<table>
-    <tr *ngFor="let fach of fachList">
-      <td>
-        {{fach.name}}
-      </td>
-      <td>
-        <table>
-          <tr>
-            <td *ngFor="let gegenstand of fach?.gegenstandList">
-              {{gegenstand.name}}
-            </td>
-          </tr>
-        </table>
-      </td>
-    </tr>
-  </table>
--->
+<div class="modal" id="modal" tabindex="-1" role="dialog"
+     aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="exampleModalLongTitle">information</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <ng-container *ngIf="addDialogBool">
+      </ng-container>
+      <ng-container *ngIf="!addDialogBool">
+        <div class="modal-body" *ngFor="let gegenstand of fachList[currentFachIndex].gegenstandList, let i = index">
+          <div class="gegenstandHoverDiv" (click)="deleteGegenstand(gegenstand.gegenstandId)">
+            {{gegenstand.name}}
+          </div>
+        </div>
+      </ng-container>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+      </div>
+    </div>
+  </div>
+</div>
