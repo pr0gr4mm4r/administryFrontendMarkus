@@ -5,7 +5,7 @@ import {SearchComponent} from "./search/search.component";
 import {UiModule} from "../ui/ui.module";
 import {AppRoutingModule} from "../app-routing.module";
 import {SharedModule} from "../shared/shared.module";
-import {FormsModule, ReactiveFormsModule} from "@angular/forms";
+import {FormsModule} from "@angular/forms";
 
 
 @NgModule({

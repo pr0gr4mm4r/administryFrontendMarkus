@@ -4,4 +4,5 @@ export class Gegenstand {
   gegenstandId: number;
   name: String;
   fach: Fach;
+  menge: number;
 }

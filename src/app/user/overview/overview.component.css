@@ -17,3 +17,9 @@
 .gegenstandHoverDiv:hover{
   cursor: pointer;
 }
+.ausleihenDiv:hover{
+  background-color: white;
+}
+#wrapper{
+  text-align: center;
+}

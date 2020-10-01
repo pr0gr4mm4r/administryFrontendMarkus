@@ -20,7 +20,6 @@ export class AddComponent implements OnInit {
   }
 
   addGegenstand() {
-    console.log(this.gegenstand);
-    this.gegenstandService.add(this.gegenstand.name, this.gegenstand.fach.fachId).subscribe((response)=>console.log(response));
+    this.gegenstandService.add(this.gegenstand.name, this.gegenstand.fach.name, 1).subscribe((response)=>console.log(response));
   }
 }

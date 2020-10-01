@@ -12,11 +12,11 @@ export class GegenstandService {
 
   constructor(private http: HttpClient) { }
 
-  add(gegenstandName, fachId): Observable<Gegenstand> {
-    return this.http.post<Gegenstand>(environment.apiUrl + '/gegenstand/add/', [gegenstandName, fachId]);
+  add(gegenstandName: String, fachId: String, menge: number): Observable<Gegenstand> {
+    return this.http.post<Gegenstand>(environment.apiUrl + '/gegenstand/add/', [gegenstandName, fachId, menge]);
   }
 
-  delete(gegenstandId:number) {
+  delete(gegenstandId: number) {
     return this.http.delete<Gegenstand>(environment.apiUrl + '/gegenstand/delete/' + gegenstandId);
   }
 }
