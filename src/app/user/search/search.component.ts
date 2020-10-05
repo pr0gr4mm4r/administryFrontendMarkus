@@ -27,7 +27,7 @@ export class SearchComponent implements OnInit {
       for (let i = 0; i < this.fachList.length; i++) {
         for (let j = 0; j < this.fachList[i].gegenstandList.length; j++) {
           this.aktuelleGegenstandFachStringList.push(
-            this.fachList[i].gegenstandList[j].name + " [ " + this.fachList[i].name + " ]");
+            this.fachList[i].gegenstandList[j].gegenstandName + " [ " + this.fachList[i].fachName + " ]");
         }
       }
     });

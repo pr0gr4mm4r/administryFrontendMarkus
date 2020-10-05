@@ -2,6 +2,6 @@ import {Gegenstand} from "../gegenstand/gegenstand";
 
 export class Fach {
   fachId: number;
-  name: String;
+  fachName: String;
   gegenstandList: Gegenstand[];
 }

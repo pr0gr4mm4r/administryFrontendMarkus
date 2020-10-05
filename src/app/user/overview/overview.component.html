@@ -1,7 +1,7 @@
 <div *ngFor="let fach of fachListToDisplay, let fachIndex = index" style="display: inline-block; float: left;
       margin-top: 50px; margin-left: 80px; width: 350px; background-color: #ebebeb;
        border: 3px solid black; text-align: center">
-  <div style="border: 3px solid black; margin:3px; width: 96%;"><h4>Fach&nbsp;{{fach.name}}</h4></div>
+  <div style="border: 3px solid black; margin:3px; width: 96%;"><h4>Fach&nbsp;{{fach.fachName}}</h4></div>
   <div (click)="openAddDialog(fachIndex)" id="addDiv" class="addOrDeleteDiv">
     <div>
       <mat-icon>add</mat-icon>
@@ -15,26 +15,30 @@
   <div *ngFor="let gegenstand of fach?.gegenstandList, let indexGegenstand = index"
        style="padding: 3px">
     <ng-container *ngIf="indexGegenstand === 0">
-      <div style="font-size: 19px">{{gegenstand.name}}&nbsp;&nbsp;<span>({{gegenstand.menge}})</span></div>
+      <div [ngClass]="{'ausgeliehen2' : gegenstand.ausgeliehen}"
+           style="font-size: 19px">{{gegenstand.gegenstandName}}&nbsp;&nbsp;<span>({{gegenstand.menge}})</span>
+      </div>
     </ng-container>
     <ng-container *ngIf="indexGegenstand !== 0">
-      {{gegenstand.name}}&nbsp;&nbsp;<span>({{gegenstand.menge}})</span>
+      <div [ngClass]="{'ausgeliehen2' : gegenstand.ausgeliehen}">
+        {{gegenstand.gegenstandName}}&nbsp;&nbsp;<span>({{gegenstand.menge}}) </span>
+      </div>
     </ng-container>
   </div>
   <div class="addOrDeleteDiv">
-    <div class="ausleihenDiv">
+    <div class="ausleihenDiv" (click)="ausleihenOpen(fachIndex)">
       Ausleihen
     </div>
   </div>
   <div class="addOrDeleteDiv">
-    <div class="ausleihenDiv">
+    <div class="ausleihenDiv" (click)="abgebenOpen(fachIndex)">
       Rückgabe
     </div>
   </div>
 </div>
 
 
-<div class="modal" id="modal" tabindex="-1" role="dialog"
+<div data-keyboard="false" data-backdrop="static" class="modal" id="modal" tabindex="-1" role="dialog"
      aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
   <div class="modal-dialog modal-dialog-centered" role="document">
     <div class="modal-content">
@@ -43,21 +47,21 @@
           <span *ngIf="addDialogBool">Gegenstand Hinzufügen</span>
           <span *ngIf="!addDialogBool">Gegenstand Löschen</span>
         </h5>
-        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close" (click)="disableBools()">
           <span aria-hidden="true">&times;</span>
         </button>
       </div>
-      <ng-container *ngIf="addDialogBool">
-        <div class="modal-body">
-          <div id="wrapper">
+      <div id="wrapper">
+        <ng-container *ngIf="addDialogBool">
+          <div class="modal-body">
             <mat-form-field [style.width.px]=300 ngDefaultControl>
-              <input matInput autocomplete="off" id="name" [(ngModel)]="gegenstand.name"
+              <input matInput autocomplete="off" id="name" [(ngModel)]="gegenstandToAdd.gegenstandName"
                      name="name" type="text" placeholder="Wähle einen Namen für den Gegenstand">
             </mat-form-field>
             <br><br>
             <mat-form-field [style.width.px]=245 ngDefaultControl>
               <input matInput autocomplete="off" id="fachnummer" [(ngModel)]="currentFachName"
-                     name="fachnummer" type="number" placeholder="Gib eine Schließfachnummer an">
+                     name="fachnummer" type="text" placeholder="Gib eine Schließfachnummer an">
             </mat-form-field>
             <br><br>
             <mat-form-field [style.width.px]=250 ngDefaultControl>
@@ -65,21 +69,101 @@
                      name="menge" type="number" placeholder="Gib die gewünschte Menge an">
             </mat-form-field>
           </div>
-        </div>
-      </ng-container>
-      <ng-container *ngIf="!addDialogBool">
-        <div class="modal-body"
-             *ngFor="let gegenstand of fachListToDisplay[currentFachIndex]?.gegenstandList, let i = index">
-          <div class="gegenstandHoverDiv" (click)="deleteGegenstand(i)">
-            {{gegenstand.name}}&nbsp;&nbsp;<span>({{gegenstand.menge}})</span>
+        </ng-container>
+        <ng-container *ngIf="!addDialogBool">
+          <div class="modal-body"
+               *ngFor="let gegenstand of fachListToDisplay[currentFachIndex]?.gegenstandList, let i = index">
+            <div class="gegenstandHoverDiv" (click)="deleteGegenstand(i)">
+              {{gegenstand.gegenstandName}}&nbsp;&nbsp;<span>({{gegenstand.menge}})</span>
+            </div>
           </div>
-        </div>
-      </ng-container>
+        </ng-container>
+      </div>
       <div class="modal-footer">
         <button *ngIf="addDialogBool" style="margin-right: 15px" class="btn btn-info" (click)="addGegenstand()">
           Zum Bestand Hinzufügen
         </button>
-        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+        <button type="button" class="btn btn-secondary" data-dismiss="modal" (click)="disableBools()">Close</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div data-keyboard="false" data-backdrop="static" class="modal" id="modal2" tabindex="-1" role="dialog"
+     aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h5 class="modal-title w-100" id="exampleModalLongTitle2">
+          <span *ngIf="ausleihenBool">Gegenstand Ausleihen</span>
+          <span *ngIf="!ausleihenBool">Gegenstand Abgeben</span>
+        </h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close" (click)="disableBools()">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div id="wrapper2">
+        <ng-container *ngIf="!ausleihenBool && benutzerDatenBool">
+          <div class="modal-body">
+            <mat-form-field [style.width.px]=250 ngDefaultControl>
+              <input matInput autocomplete="off" id="studentName1" [(ngModel)]="student.studentName"
+                     name="name" type="text" placeholder="Gib hier deinen Namen an">
+            </mat-form-field>
+            <mat-form-field [style.width.px]=255 ngDefaultControl>
+              <input matInput autocomplete="off" id="studentTelefon1" [(ngModel)]="student.handyNummer"
+                     name="name" type="text" placeholder="Gib hier eine Telefonnummer an">
+            </mat-form-field>
+          </div>
+        </ng-container>
+        <ng-container *ngIf="ausleihenBool && benutzerDatenBool">
+          <div class="modal-body">
+            <mat-form-field [style.width.px]=250 ngDefaultControl>
+              <input matInput autocomplete="off" id="studentName2" [(ngModel)]="student.studentName"
+                     name="name" type="text" placeholder="Gib hier deinen Namen an">
+            </mat-form-field>
+            <mat-form-field [style.width.px]=255 ngDefaultControl>
+              <input matInput autocomplete="off" id="studentTelefon2" [(ngModel)]="student.handyNummer"
+                     name="name" type="text" placeholder="Gib hier eine Telefonnummer an">
+            </mat-form-field>
+          </div>
+        </ng-container>
+        <ng-container *ngIf="!ausleihenBool && !benutzerDatenBool">
+          <div class="modal-body">
+            <div *ngFor="let gegenstand of studentFachGegenstandList; let i = index">
+              <div class="gegenstandHoverDiv" (click)="setSelectedGegenstandToAbgeben(i)">
+                {{gegenstand.gegenstandName}}
+              </div>
+            </div>
+          </div>
+        </ng-container>
+        <ng-container *ngIf="ausleihenBool && !benutzerDatenBool">
+          <div class="modal-body"
+               *ngFor="let gegenstand of fachList[currentFachIndex]?.gegenstandList, let i = index">
+            <div class="gegenstandHoverDiv" (click)="setSelectedGegenstandToAusleihen(i)" [ngClass]="{
+            'ausgeliehen' : !gegenstand.ausgeliehen, 'abgegeben' : gegenstand.ausgeliehen}">
+              <span>{{gegenstand.gegenstandName}}</span>
+            </div>
+          </div>
+        </ng-container>
+      </div>
+      <div class="modal-footer">
+        <button [disabled]="!student.studentName || !student.handyNummer"
+                *ngIf="benutzerDatenBool" style="margin-right: 15px"
+                class="btn btn-info" (click)="this.legeBenutzerAn()">
+          Weiter
+        </button>
+        <button
+          *ngIf="ausleihenBool && weiterBool" style="margin-right: 15px"
+          [disabled]="!gegenstandToAusleihen.gegenstandName || gegenstandToAusleihen.ausgeliehen"
+          class="btn btn-info" (click)="ausleihen()">
+          Ausleihen
+        </button>
+        <button
+          *ngIf="!ausleihenBool && weiterBool" [disabled]="!gegenstandToAbgeben.gegenstandName" style="margin-right: 15px"
+          class="btn btn-info" (click)="abgeben()">
+          Abgeben
+        </button>
+        <button type="button" class="btn btn-secondary" data-dismiss="modal" (click)="disableBools()">Close</button>
       </div>
     </div>
   </div>

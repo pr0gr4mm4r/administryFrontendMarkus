@@ -16,10 +16,24 @@
 }
 .gegenstandHoverDiv:hover{
   cursor: pointer;
+  font-weight: bold;
+  font-size: 102%;
 }
 .ausleihenDiv:hover{
   background-color: white;
 }
 #wrapper{
   text-align: center;
+}
+#wrapper2{
+  text-align: center;
+}
+.ausgeliehen{
+  background-color: mediumspringgreen;
+}
+.ausgeliehen2{
+  color: dimgray;
+}
+.abgegeben{
+  background-color: orangered;
 }

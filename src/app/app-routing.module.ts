@@ -5,9 +5,10 @@ import {SearchComponent} from "./user/search/search.component";
 import {AddComponent} from "./admin/add/add.component";
 
 const routes: Routes = [
-  {path: '', component: AddComponent},
+  {path: '', component: OverviewComponent},
   {path: 'overview', component: OverviewComponent},
   {path: 'search', component: SearchComponent},
+  {path: 'add', component: AddComponent},
 ];
 
 @NgModule({
