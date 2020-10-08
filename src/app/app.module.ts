@@ -10,6 +10,7 @@ import {AdminModule} from "./admin/admin.module";
 import {GegenstandService} from "./services/gegenstand/gegenstand.service";
 import {FachService} from "./services/fach/fach.service";
 import {StudentService} from "./services/student/student.service";
+import {AusleihenAbgebenService} from "./services/ausleihenAbgeben/ausleihen-abgeben.service";
 
 @NgModule({
   declarations: [
@@ -23,7 +24,7 @@ import {StudentService} from "./services/student/student.service";
     UiModule,
     AdminModule
   ],
-  providers: [GegenstandService, FachService, StudentService],
+  providers: [GegenstandService, FachService, StudentService, AusleihenAbgebenService],
   bootstrap: [AppComponent]
 })
 export class AppModule { }

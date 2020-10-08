@@ -20,13 +20,7 @@ export class StudentService {
     return this.http.get<Student>(environment.apiUrl + '/student/' + student.studentName + '/' + student.handyNummer);
   }
 
-  ausleihen(studentName: String, handyNummer: String, gegenstandId: number): Observable<String> {
-    return this.http.post<String>(environment.apiUrl + '/student/ausleihen/' + gegenstandId,
-      [studentName, handyNummer], { responseType: "text" as 'json'});
-  }
-
-  abgeben(studentName: String, handyNummer: String, gegenstandId: number): Observable<String> {
-    return this.http.post<String>(environment.apiUrl + '/student/abgeben/' + gegenstandId,
-      [studentName, handyNummer], { responseType: "text" as 'json'});
+  getAll():Observable<Student[]>{
+    return this.http.get<Student[]>(environment.apiUrl + '/student/all');
   }
 }

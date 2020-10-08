@@ -1,39 +1,55 @@
-.addOrDeleteDiv{
-  width:50%;
-  margin-top:5px;
+.addOrDeleteDiv {
+  width: 50%;
+  margin-top: 5px;
   text-align: center;
   display: inline-block;
 }
 
-.addOrDeleteDiv:hover{
+.addOrDeleteDiv:hover {
   cursor: pointer;
 }
-#addDiv:hover{
+
+#addDiv:hover {
   background-color: mediumspringgreen;
 }
-#deleteDiv:hover{
+
+#deleteDiv:hover {
   background-color: orangered;
 }
-.gegenstandHoverDiv:hover{
+
+.gegenstandHoverDiv:hover {
   cursor: pointer;
   font-weight: bold;
   font-size: 102%;
 }
-.ausleihenDiv:hover{
+
+.ausleihenDiv:hover {
   background-color: white;
 }
-#wrapper{
+
+#wrapper {
   text-align: center;
 }
-#wrapper2{
+
+#wrapper2 {
   text-align: center;
 }
-.ausgeliehen{
+
+.ausgeliehen {
   background-color: mediumspringgreen;
 }
-.ausgeliehen2{
-  color: dimgray;
+
+.ausgeliehen2 {
+  color: red;
 }
-.abgegeben{
+
+.abgegeben {
   background-color: orangered;
+}
+
+.selected {
+  border: 4px solid black;
+}
+.selected2 {
+  border: 3px solid black;
 }

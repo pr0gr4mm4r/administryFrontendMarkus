@@ -129,8 +129,9 @@
         </ng-container>
         <ng-container *ngIf="!ausleihenBool && !benutzerDatenBool">
           <div class="modal-body">
-            <div *ngFor="let gegenstand of studentFachGegenstandList; let i = index">
-              <div class="gegenstandHoverDiv" (click)="setSelectedGegenstandToAbgeben(i)">
+            <div *ngFor="let gegenstand of studentFachGegenstandList, let i = index">
+              <div class="gegenstandHoverDiv" (click)="addSelectedGegenstandToAbgeben(i)"
+                   [ngClass]="{'selected2' : gegenstand.selected}">
                 {{gegenstand.gegenstandName}}
               </div>
             </div>
@@ -138,9 +139,10 @@
         </ng-container>
         <ng-container *ngIf="ausleihenBool && !benutzerDatenBool">
           <div class="modal-body"
-               *ngFor="let gegenstand of fachList[currentFachIndex]?.gegenstandList, let i = index">
-            <div class="gegenstandHoverDiv" (click)="setSelectedGegenstandToAusleihen(i)" [ngClass]="{
-            'ausgeliehen' : !gegenstand.ausgeliehen, 'abgegeben' : gegenstand.ausgeliehen}">
+               *ngFor="let gegenstand of fachList[currentFachIndex]?.gegenstandList">
+            <div class="gegenstandHoverDiv" (click)="addSelectedGegenstandToAusleihen(gegenstand)"
+                 [ngClass]="{'ausgeliehen' : !gegenstand.ausgeliehen,
+                  'abgegeben' : gegenstand.ausgeliehen, 'selected' : gegenstand.selected}">
               <span>{{gegenstand.gegenstandName}}</span>
             </div>
           </div>
@@ -154,16 +156,18 @@
         </button>
         <button
           *ngIf="ausleihenBool && weiterBool" style="margin-right: 15px"
-          [disabled]="!gegenstandToAusleihen.gegenstandName || gegenstandToAusleihen.ausgeliehen"
+          [disabled]="!keinGegenstandToAusleihenSelektiert()"
           class="btn btn-info" (click)="ausleihen()">
           Ausleihen
         </button>
         <button
-          *ngIf="!ausleihenBool && weiterBool" [disabled]="!gegenstandToAbgeben.gegenstandName" style="margin-right: 15px"
+          *ngIf="!ausleihenBool && weiterBool" [disabled]="!keinGegenstandToAbgebenSelektiert()"
+          style="margin-right: 15px"
           class="btn btn-info" (click)="abgeben()">
           Abgeben
         </button>
-        <button type="button" class="btn btn-secondary" data-dismiss="modal" (click)="disableBools()">Close</button>
+        <button type="button" class="btn btn-secondary" data-dismiss="modal"
+                (click)="disableBools()">Close</button>
       </div>
     </div>
   </div>

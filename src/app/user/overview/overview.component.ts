@@ -6,6 +6,7 @@ import {Gegenstand} from "../../model/gegenstand/gegenstand";
 import {Router} from "@angular/router";
 import {Student} from "../../model/student/student";
 import {StudentService} from "../../services/student/student.service";
+import {AusleihenAbgebenService} from "../../services/ausleihenAbgeben/ausleihen-abgeben.service";
 
 declare var $;
 
@@ -19,8 +20,8 @@ export class OverviewComponent implements OnInit {
   ausleihenBool: boolean;
   fachnummerNameAnzahlMapMap: Map<String, Map<String, number>>;
   gegenstandToAdd: Gegenstand = new Gegenstand();
-  gegenstandToAusleihen: Gegenstand = new Gegenstand();
-  gegenstandToAbgeben: Gegenstand = new Gegenstand();
+  gegenstandListToAusleihen: Gegenstand[] = [];
+  gegenstandListToAbgeben: Gegenstand[] = [];
   currentFachName: String = "";
   menge: number = 1;
   fachList: Fach[] = [];
@@ -34,6 +35,7 @@ export class OverviewComponent implements OnInit {
   constructor(private gegenstandService: GegenstandService,
               private fachService: FachService,
               private studentService: StudentService,
+              private auleihenAbgebenService: AusleihenAbgebenService,
               private router: Router) {
   }
 
@@ -52,7 +54,8 @@ export class OverviewComponent implements OnInit {
       for (let i = 0; i < this.fachList.length; i++) {
         nameAnzahlMap = new Map<String, number>();
         let counterAnzahl = 0;
-        let uniqueGegenstandNameList = [...new Set<String>(this.fachList[i].gegenstandList.map(gegenstand => gegenstand.gegenstandName))];
+        let uniqueGegenstandNameList = [...new Set<String>(this.fachList[i].gegenstandList.map(
+          gegenstand => gegenstand.gegenstandName))];
         for (let j = 0; j < uniqueGegenstandNameList.length; j++) {
           for (let k = 0; k < this.fachList[i].gegenstandList.length; k++) {
             if (uniqueGegenstandNameList[j] === this.fachList[i].gegenstandList[k].gegenstandName) {
@@ -80,7 +83,8 @@ export class OverviewComponent implements OnInit {
       for (let i = 0; i < this.fachList.length; i++) {
         for (let j = 0; j < this.fachListToDisplay[i].gegenstandList.length; j++) {
           const mengeFachListToDisplay: number = this.fachListToDisplay[i].gegenstandList[j].menge;
-          const mengeAusgeliehenFachList: number = JSON.parse(JSON.stringify(this.fachList[i].gegenstandList)).filter(
+          const mengeAusgeliehenFachList: number = JSON.parse(
+            JSON.stringify(this.fachList[i].gegenstandList)).filter(
             gegenstand => gegenstand.gegenstandName === this.fachListToDisplay[i].gegenstandList[j].gegenstandName
               && gegenstand.ausgeliehen).length;
           this.fachListToDisplay[i].gegenstandList[j].ausgeliehen = mengeAusgeliehenFachList - mengeFachListToDisplay === 0;
@@ -177,17 +181,35 @@ export class OverviewComponent implements OnInit {
     this.benutzerDatenBool = false;
   }
 
-  setSelectedGegenstandToAusleihen(index: number) {
-    this.gegenstandToAusleihen = this.fachList[this.currentFachIndex].gegenstandList[index];
+  addSelectedGegenstandToAusleihen(gegenstand: Gegenstand) {
+    if (!gegenstand.ausgeliehen) {
+      gegenstand.selected = !gegenstand.selected;
+    }
+    this.gegenstandListToAusleihen = [];
+    for (let i = 0; i < this.fachList[this.currentFachIndex].gegenstandList.length; i++) {
+      if (this.fachList[this.currentFachIndex].gegenstandList[i].selected) {
+        this.gegenstandListToAusleihen.push(
+          this.fachList[this.currentFachIndex].gegenstandList[i]);
+      }
+    }
   }
 
-  setSelectedGegenstandToAbgeben(index: number) {
-    this.gegenstandToAbgeben = this.studentFachGegenstandList.find(
-      gegenstand1 => this.fachList[this.currentFachIndex].gegenstandList.map(
-        gegenstand2 => gegenstand2.gegenstandId).includes(gegenstand1.gegenstandId));
+
+  addSelectedGegenstandToAbgeben(index: number) {
+    this.studentFachGegenstandList[index].selected = !this.studentFachGegenstandList[index].selected;
+    this.gegenstandListToAbgeben = [];
+    let gegenstand;
+    for (let i = 0; i < this.studentFachGegenstandList.length; i++) {
+      gegenstand = this.studentFachGegenstandList[i];
+      if (gegenstand.selected) {
+        this.gegenstandListToAbgeben.push(gegenstand);
+      }
+    }
   }
 
   disableBools() {
+    this.fachList[this.currentFachIndex].gegenstandList.forEach(gegenstand => gegenstand.selected = false);
+    this.gegenstandListToAbgeben = [];
     this.weiterBool = false;
     this.ausleihenBool = false;
   }
@@ -196,27 +218,42 @@ export class OverviewComponent implements OnInit {
     this.studentService.get(this.student).subscribe(student => {
       this.student = student;
       this.studentFachGegenstandList = JSON.parse(JSON.stringify(this.student.gegenstandList));
-      this.studentFachGegenstandList = this.studentFachGegenstandList.filter(
+      this.studentFachGegenstandList = JSON.parse(JSON.stringify(this.studentFachGegenstandList)).filter(
         gegenstand1 => this.fachList[this.currentFachIndex].gegenstandList.map(
           gegenstand2 => gegenstand2.gegenstandId).includes(gegenstand1.gegenstandId));
     });
   }
 
   ausleihen() {
-    this.studentService.ausleihen(
-      this.student.studentName, this.student.handyNummer, this.gegenstandToAusleihen.gegenstandId).subscribe(
+    this.auleihenAbgebenService.ausleihen(
+      this.student.studentName, this.student.handyNummer,
+      Array.from(new Set(this.gegenstandListToAusleihen)).map(
+        gegenstand => gegenstand.gegenstandId)
+    ).subscribe(
       () => {
         this.router.navigate(['overview']);
       }, error => alert("Ausleihvorgang NICHT abgeschlossen!"));
   }
 
   abgeben() {
-    this.studentService.abgeben(
-      this.student.studentName, this.student.handyNummer, this.gegenstandToAbgeben.gegenstandId).subscribe(
+    this.auleihenAbgebenService.abgeben(
+      this.student.studentName, this.student.handyNummer,
+      Array.from(new Set(this.gegenstandListToAbgeben)).map(gegenstand => gegenstand.gegenstandId)).subscribe(
       message => {
         this.router.navigate(['overview']);
       }, error => {
         alert("Abgabevorgang NICHT abgeschlossen!");
       });
+  }
+
+  keinGegenstandToAusleihenSelektiert(): boolean {
+    return JSON.parse(JSON.stringify(this.gegenstandListToAusleihen)).filter(
+      gegenstand => gegenstand.selected).length > 0;
+  }
+
+  keinGegenstandToAbgebenSelektiert(): boolean {
+    return JSON.parse(
+      JSON.stringify(this.studentFachGegenstandList)).filter(
+      gegenstand => gegenstand.selected).length > 0;
   }
 }

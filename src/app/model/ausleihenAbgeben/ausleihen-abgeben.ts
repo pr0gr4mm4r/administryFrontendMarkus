@@ -1,10 +1,9 @@
-import {Gegenstand} from "../gegenstand/gegenstand";
 import {Student} from "../student/student";
 
 export class AusleihenAbgeben {
   ausleihenAbgebenId: number;
   student: Student;
-  gegenstand: Gegenstand;
+  ausleihInhaltString: String;
   ausleihDatum: Date;
-  abgabeDatum: Date;
+  kompletteAbgabeDatum: Date;
 }

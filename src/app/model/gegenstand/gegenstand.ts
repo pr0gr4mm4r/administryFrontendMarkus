@@ -6,4 +6,5 @@ export class Gegenstand {
   fach: Fach;
   menge: number;
   ausgeliehen: boolean;
+  selected: boolean;
 }

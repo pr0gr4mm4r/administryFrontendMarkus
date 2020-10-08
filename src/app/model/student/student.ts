@@ -5,6 +5,6 @@ export class Student {
   studentId: number;
   studentName: String;
   handyNummer: String;
-  ausleihenUndAbgebenList: AusleihenAbgeben[];
+  ausleihenAbgebenList: AusleihenAbgeben[];
   gegenstandList: Gegenstand[];
 }
