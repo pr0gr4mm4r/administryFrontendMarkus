@@ -18,4 +18,8 @@ export class FachService {
   retrieve(): Observable<[Fach]> {
     return this.http.get<[Fach]>(environment.apiUrl + '/fach/all');
   }
+
+  retrieveOne():Observable<Fach>{
+    return this.http.get<Fach>(environment.apiUrl + '/fach/pool');
+  }
 }

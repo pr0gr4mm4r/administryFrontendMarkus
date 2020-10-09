@@ -48,7 +48,6 @@ export class OverviewComponent implements OnInit {
     this.gegenstandToAdd.fach = new Fach();
     this.fachService.retrieve().subscribe(response => {
       this.fachList = response;
-      this.fachList = this.fachList.filter(fach => fach.gegenstandList.length !== 0);
       this.fachnummerNameAnzahlMapMap = new Map<String, Map<String, number>>();
       let nameAnzahlMap;
       for (let i = 0; i < this.fachList.length; i++) {
