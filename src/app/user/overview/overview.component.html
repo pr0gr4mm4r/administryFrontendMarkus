@@ -1,7 +1,7 @@
 <div *ngFor="let fach of fachListToDisplay, let fachIndex = index" style="display: inline-block; float: left;
       margin-top: 50px; margin-left: 80px; width: 350px; background-color: #ebebeb;
-       border: 3px solid black; text-align: center">
-  <div style="border: 3px solid black; margin:3px; width: 96%;"><h4>Fach&nbsp;{{fach.fachName}}</h4></div>
+       border-width: 3px; border-style: solid; border-color: black; text-align: center">
+  <div style="border-color: black; border-style: double; border-width: 3px; margin:5px; width: 96%;"><div style="margin: 7px"><h4>Fach&nbsp;{{fach.fachName}}</h4></div></div>
   <div (click)="openAddDialog(fachIndex)" id="addDiv" class="addOrDeleteDiv">
     <div>
       <mat-icon>add</mat-icon>
@@ -12,19 +12,37 @@
       <mat-icon>delete</mat-icon>
     </div>
   </div>
-  <div *ngFor="let gegenstand of fach?.gegenstandList, let indexGegenstand = index"
-       style="padding: 3px">
-    <ng-container *ngIf="indexGegenstand === 0">
-      <div [ngClass]="{'ausgeliehen2' : gegenstand.ausgeliehen}"
-           style="font-size: 19px">{{gegenstand.gegenstandName}}&nbsp;&nbsp;<span>({{gegenstand.menge}})</span>
-      </div>
-    </ng-container>
-    <ng-container *ngIf="indexGegenstand !== 0">
-      <div [ngClass]="{'ausgeliehen2' : gegenstand.ausgeliehen}">
-        {{gegenstand.gegenstandName}}&nbsp;&nbsp;<span>({{gegenstand.menge}}) </span>
-      </div>
-    </ng-container>
-  </div>
+  <ng-container *ngIf="fach.leer">
+    <div *ngFor="let gegenstand of fach.gegenstandList, let indexGegenstand = index"
+         style="padding: 3px">
+      <ng-container *ngIf="indexGegenstand === 0">
+        <div [ngClass]="{'ausgeliehen2' : gegenstand.ausgeliehen}"
+             style="font-size: 19px">{{gegenstand.gegenstandName}}&nbsp;&nbsp;
+        </div>
+      </ng-container>
+      <ng-container *ngIf="indexGegenstand !== 0">
+        <div [ngClass]="{'ausgeliehen2' : gegenstand.ausgeliehen}">
+          {{gegenstand.gegenstandName}}
+        </div>
+      </ng-container>
+    </div>
+  </ng-container>
+  <ng-container *ngIf="!fach.leer">
+    <div *ngFor="let gegenstand of fach.gegenstandList, let indexGegenstand = index"
+         style="padding: 3px">
+      <ng-container *ngIf="indexGegenstand === 0">
+        <div [ngClass]="{'ausgeliehen2' : gegenstand.ausgeliehen}"
+             style="font-size: 19px">{{gegenstand.gegenstandName}}&nbsp;&nbsp;
+          <span>({{gegenstand.menge}})</span>
+        </div>
+      </ng-container>
+      <ng-container *ngIf="indexGegenstand !== 0">
+        <div [ngClass]="{'ausgeliehen2' : gegenstand.ausgeliehen}">
+          {{gegenstand.gegenstandName}}&nbsp;&nbsp;<span>({{gegenstand.menge}}) </span>
+        </div>
+      </ng-container>
+    </div>
+  </ng-container>
   <div class="addOrDeleteDiv">
     <div class="ausleihenDiv" (click)="ausleihenOpen(fachIndex)">
       Ausleihen
@@ -36,8 +54,19 @@
     </div>
   </div>
 </div>
-
-
+<div style="text-align: center; border: 2px solid black;
+display:inline-block; float: left; margin: 40px;
+width: 400px; height: 250px;">
+  <br>
+  <h3>Fach hinzufügen</h3>
+  <br>
+  <mat-form-field [style.width.px]=200>
+    <input matInput autocomplete="off" id="fach" [(ngModel)]="fach.fachName"
+           name="fach" type="text" placeholder="Gib einen Fachnamen ein">
+  </mat-form-field>
+  <br>
+  <button class="btn btn-info" (click)="fachErstellen()">Fach Erstellen</button>
+</div>
 <div data-keyboard="false" data-backdrop="static" class="modal" id="modal" tabindex="-1" role="dialog"
      aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
   <div class="modal-dialog modal-dialog-centered" role="document">
@@ -88,7 +117,6 @@
     </div>
   </div>
 </div>
-
 <div data-keyboard="false" data-backdrop="static" class="modal" id="modal2" tabindex="-1" role="dialog"
      aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
   <div class="modal-dialog modal-dialog-centered" role="document">
@@ -167,7 +195,8 @@
           Abgeben
         </button>
         <button type="button" class="btn btn-secondary" data-dismiss="modal"
-                (click)="disableBools()">Close</button>
+                (click)="disableBools()">Close
+        </button>
       </div>
     </div>
   </div>

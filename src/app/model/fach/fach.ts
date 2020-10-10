@@ -4,4 +4,5 @@ export class Fach {
   fachId: number;
   fachName: String;
   gegenstandList: Gegenstand[];
+  leer: boolean = false;
 }

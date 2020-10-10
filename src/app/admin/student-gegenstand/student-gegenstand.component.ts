@@ -14,7 +14,19 @@ export class StudentGegenstandComponent implements OnInit {
   constructor(private studentService: StudentService) { }
 
   ngOnInit(): void {
-    this.studentService.getAll().subscribe(studenten=>this.studentList = studenten);
+    this.studentService.getAll().subscribe(
+      studenten => this.studentList = studenten.sort(((a, b) => this.sortByStudentName(a, b))));
   }
 
+
+  sortByStudentName(a: Student, b: Student) {
+      let aName = a.studentName.toLowerCase();
+      let bName = b.studentName.toLowerCase();
+      if (aName < bName) {
+        return -1;
+      } else if (aName > bName) {
+        return 1;
+      }
+      return 0;
+  }
 }

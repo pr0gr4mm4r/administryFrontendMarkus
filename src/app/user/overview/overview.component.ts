@@ -31,6 +31,7 @@ export class OverviewComponent implements OnInit {
   student: Student = new Student();
   weiterBool: boolean;
   studentFachGegenstandList: Gegenstand[] = [];
+  fach: Fach = new Fach();
 
   constructor(private gegenstandService: GegenstandService,
               private fachService: FachService,
@@ -47,7 +48,7 @@ export class OverviewComponent implements OnInit {
   retrieveFachList() {
     this.gegenstandToAdd.fach = new Fach();
     this.fachService.retrieve().subscribe(response => {
-      this.fachList = response;
+      this.fachList = response.filter(fach => fach.fachName !== "Pool");
       this.fachnummerNameAnzahlMapMap = new Map<String, Map<String, number>>();
       let nameAnzahlMap;
       for (let i = 0; i < this.fachList.length; i++) {
@@ -55,19 +56,26 @@ export class OverviewComponent implements OnInit {
         let counterAnzahl = 0;
         let uniqueGegenstandNameList = [...new Set<String>(this.fachList[i].gegenstandList.map(
           gegenstand => gegenstand.gegenstandName))];
-        for (let j = 0; j < uniqueGegenstandNameList.length; j++) {
-          for (let k = 0; k < this.fachList[i].gegenstandList.length; k++) {
-            if (uniqueGegenstandNameList[j] === this.fachList[i].gegenstandList[k].gegenstandName) {
-              counterAnzahl++;
+        if (uniqueGegenstandNameList.length > 0) {
+          for (let j = 0; j < uniqueGegenstandNameList.length; j++) {
+            for (let k = 0; k < this.fachList[i].gegenstandList.length; k++) {
+              if (uniqueGegenstandNameList[j] === this.fachList[i].gegenstandList[k].gegenstandName) {
+                counterAnzahl++;
+              }
             }
+            nameAnzahlMap.set([...uniqueGegenstandNameList][j], counterAnzahl);
+            this.fachnummerNameAnzahlMapMap.set(this.fachList[i].fachName, nameAnzahlMap);
+            counterAnzahl = 0;
           }
-          nameAnzahlMap.set([...uniqueGegenstandNameList][j], counterAnzahl);
+        } else {
+          nameAnzahlMap.set(" ", 0);
           this.fachnummerNameAnzahlMapMap.set(this.fachList[i].fachName, nameAnzahlMap);
-          counterAnzahl = 0;
+
         }
       }
       for (let i = 0; i < this.fachnummerNameAnzahlMapMap.size; i++) {
         let fach = new Fach();
+        fach.leer = false;
         fach.gegenstandList = [];
         for (let j = 0; j < [...this.fachnummerNameAnzahlMapMap.values()][i].size; j++) {
           let gegenstand = new Gegenstand();
@@ -76,6 +84,9 @@ export class OverviewComponent implements OnInit {
           fach.gegenstandList.push(gegenstand);
           fach.fachName = [...this.fachnummerNameAnzahlMapMap.keys()][i];
           gegenstand.menge = +[...map.values()][j];
+        }
+        if ([...this.fachnummerNameAnzahlMapMap.values()][i].has(" ")) {
+          fach.leer = true;
         }
         this.fachListToDisplay.push(fach);
       }
@@ -254,5 +265,9 @@ export class OverviewComponent implements OnInit {
     return JSON.parse(
       JSON.stringify(this.studentFachGegenstandList)).filter(
       gegenstand => gegenstand.selected).length > 0;
+  }
+
+  fachErstellen() {
+    this.fachService.add(this.fach).subscribe();
   }
 }

@@ -1,12 +1,28 @@
 <table class="table table-striped table-bordered table-hover table-condensed">
   <thead>
   <tr>
-    <th>Name</th>
-    <th>Handynummer</th>
-    <th>Datum</th>
-    <th>Fachname</th>
-    <th>Ausgeliehen</th>
-    <th>Gegenstände</th>
+    <th class="clickable" (click)="sortByStudentNameExecution()">
+      <div style="text-align: center">Name&nbsp;&nbsp;&nbsp;
+        <span class="material-icons">sort</span>
+      </div>
+    </th>
+    <th>
+      <div style="text-align: center">Handynummer</div>
+    </th>
+    <th class="clickable">
+      <div style="text-align: center">Datum&nbsp;&nbsp;&nbsp;
+        <span class="material-icons">sort</span>
+      </div>
+    </th>
+    <th class="clickable">
+      <div style="text-align: center" (click)="sortByFachNameExecution()">Fachname&nbsp;&nbsp;&nbsp;
+        <span class="material-icons">sort</span>
+      </div>
+    </th>
+    <th></th>
+    <th>
+      <div style="text-align: center">Gegenstände</div>
+    </th>
   </tr>
   </thead>
   <tbody>
@@ -15,7 +31,12 @@
     <td>{{ausleihenAbgeben.student.handyNummer}}</td>
     <td>{{ausleihenAbgeben.datum}}</td>
     <td>{{ausleihenAbgeben.fach.fachName}}</td>
-    <td>{{ausleihenAbgeben.abgeben}}</td>
+    <ng-container *ngIf="!ausleihenAbgeben.abgeben">
+      <td>Ausleihen</td>
+    </ng-container>
+    <ng-container *ngIf="ausleihenAbgeben.abgeben">
+      <td>Zurückgeben</td>
+    </ng-container>
     <td>
       <table class="table table-striped table-bordered table-hover table-condensed"
              *ngFor="let gegenstand of ausleihenAbgeben.gegenstandList">
