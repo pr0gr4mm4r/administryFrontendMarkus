@@ -6,3 +6,6 @@
   cursor: pointer;
   background-color: orange;
 }
+.material-icons {
+  vertical-align: middle;
+}

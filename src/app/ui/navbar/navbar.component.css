@@ -4,10 +4,6 @@
   cursor: pointer;
 }
 
-#logo:hover{
-  background-color: #ffa238;
-}
-
 #navHeading {
   font-size: 150%;
   color: black;
@@ -19,12 +15,9 @@
   background-color: #bdf0f5;
 }
 
-.dropdown-menu{
-  background-color: #d2f5f9;
-}
 
 a:hover {
-  background-color: #ffa238;
+  background-color: black;
   color: white;
 }
 
