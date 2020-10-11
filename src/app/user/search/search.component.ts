@@ -10,6 +10,7 @@ import {FachService} from "../../services/fach/fach.service";
   templateUrl: './search.component.html',
   styleUrls: ['./search.component.css']
 })
+
 export class SearchComponent implements OnInit {
 
   suche: String = "";
@@ -31,7 +32,10 @@ export class SearchComponent implements OnInit {
         }
       }
     });
+    this.fillFilteredOptions();
+  }
 
+  fillFilteredOptions() {
     this.filteredOptions = this.myControl.valueChanges.pipe(
       startWith(''),
       map(() => this.aktuelleGegenstandFachStringList.filter(
@@ -49,12 +53,14 @@ export class SearchComponent implements OnInit {
         this.aktuelleGegenstandFachStringList.unshift(currentGegenstand);
       }
     }
-    this.filteredOptions = this.myControl.valueChanges.pipe(
-      startWith(''),
-      map(value => this.aktuelleGegenstandFachStringList.filter(
-        gegenstand => gegenstand.toLocaleLowerCase().toString().includes(this.suche.toLocaleLowerCase().toString())
-        )
-      )
-    );
+    this.fillFilteredOptions();
+  }
+
+  nurGegenstandName(s: string): string {
+    return s.substring(0, s.indexOf("[") - 1);
+  }
+
+  nurFachNummer(s: string): string {
+    return s.substring(s.indexOf("[") + 1, s.length - 1);
   }
 }

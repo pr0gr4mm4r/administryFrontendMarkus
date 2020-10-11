@@ -1,17 +1,29 @@
-<div style="text-align: center; margin: 100px">
+<div style="text-align: center; margin: 50px">
   <div>
-    <ng-container *ngIf="aktuelleGegenstandFachStringList">
-      <mat-form-field [style.width.px]=500>
-        <input matInput autocomplete="off" (input)="updateAktuelleGeg()"
-               id="formCategory" [(ngModel)]="suche"
-               name="formCategory" type="text" placeholder="Suche Gegenstand" [formControl]="myControl"
-               [matAutocomplete]="auto">
-        <mat-autocomplete #auto="matAutocomplete">
-          <mat-option *ngFor="let option of filteredOptions | async" [value]="option">
-            {{option}}
-          </mat-option>
-        </mat-autocomplete>
-      </mat-form-field>
-    </ng-container>
+    <mat-form-field [style.width.px]=500>
+      <input matInput autocomplete="off" (input)="updateAktuelleGeg()"
+             id="search" [(ngModel)]="suche"
+             name="search" type="text" placeholder="Suche Gegenstand">
+    </mat-form-field>
   </div>
+  <ng-container *ngIf="suche">
+    <table class="table table-striped table-bordered table-hover table-condensed">
+      <thead>
+      <tr>
+        <th>Gegenstand</th>
+        <th>Fach</th>
+      </tr>
+      </thead>
+      <tbody>
+      <tr *ngFor="let option of filteredOptions | async">
+        <td>
+          {{nurGegenstandName(option.toString())}}
+        </td>
+        <td>
+          {{nurFachNummer(option.toString())}}
+        </td>
+      </tr>
+      </tbody>
+    </table>
+  </ng-container>
 </div>

@@ -10,7 +10,7 @@
       <div style="text-align: center">Handynummer</div>
     </th>
     <th class="clickable">
-      <div style="text-align: center">Datum&nbsp;&nbsp;&nbsp;
+      <div style="text-align: center" (click)="sortByDateExectution()">Zeitstempel &nbsp;&nbsp;&nbsp;
         <span class="material-icons">sort</span>
       </div>
     </th>
@@ -29,7 +29,7 @@
   <tr id="row" *ngFor="let ausleihenAbgeben of ausleihenAbgebenList, let i = index">
     <td>{{ausleihenAbgeben.student.studentName}}</td>
     <td>{{ausleihenAbgeben.student.handyNummer}}</td>
-    <td>{{ausleihenAbgeben.datum}}</td>
+    <td>{{ausleihenAbgeben.datum}}&nbsp;Uhr</td>
     <td>{{ausleihenAbgeben.fach.fachName}}</td>
     <ng-container *ngIf="!ausleihenAbgeben.abgeben">
       <td>Ausleihen</td>

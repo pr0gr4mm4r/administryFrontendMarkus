@@ -5,7 +5,7 @@ import {Fach} from "../fach/fach";
 export class AusleihenAbgeben {
   ausleihenAbgebenId: number;
   student: Student;
-  datum: Date;
+  datum: Date = new Date();
   gegenstandList: Gegenstand[];
   fach: Fach;
   abgeben: boolean;

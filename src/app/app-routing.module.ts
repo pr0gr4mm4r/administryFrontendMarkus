@@ -1,10 +1,10 @@
 import {NgModule} from '@angular/core';
 import {RouterModule, Routes} from "@angular/router";
 import {OverviewComponent} from "./user/overview/overview.component";
-import {SearchComponent} from "./user/search/search.component";
 import {AusleihenAbgabeComponent} from "./admin/ausleihen-abgabe/ausleihen-abgabe.component";
 import {StudentGegenstandComponent} from "./admin/student-gegenstand/student-gegenstand.component";
 import {PoolComponent} from "./admin/pool/pool.component";
+import {SearchComponent} from "./user/search/search.component";
 
 const routes: Routes = [
   {path: '', component: OverviewComponent},

@@ -1,5 +1,19 @@
 <div class="wrapper">
-  <div *ngFor="let gegenstand of pool.gegenstandList">
-      {{gegenstand.gegenstandName}}
+  <div>
+    <mat-form-field [style.width.px]=500>
+      <input matInput autocomplete="off" (input)="filterPool()"
+             id="search" [(ngModel)]="suche"
+             name="search" type="text" placeholder="Suche Gegenstand">
+    </mat-form-field>
+  </div>
+  <br>
+  <div style="display: inline-block; margin-top: 3%;  width: 350px; background-color: #ebebeb;
+       border-width: 3px; border-style: solid; border-color: black; text-align: center">
+    <div style="margin: 3%; border-width: 1px; border-style: solid; border-color: black;">
+      <h4 style="margin: 3%">Pool</h4>
+    </div>
+    <div *ngFor="let option of filteredOptions | async">
+      {{option}}
+    </div>
   </div>
 </div>

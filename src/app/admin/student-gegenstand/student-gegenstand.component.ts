@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import {Component, OnInit} from '@angular/core';
 import {StudentService} from "../../services/student/student.service";
 import {Student} from "../../model/student/student";
 
@@ -11,7 +11,8 @@ export class StudentGegenstandComponent implements OnInit {
 
   studentList: Student[] = [];
 
-  constructor(private studentService: StudentService) { }
+  constructor(private studentService: StudentService) {
+  }
 
   ngOnInit(): void {
     this.studentService.getAll().subscribe(
@@ -20,13 +21,13 @@ export class StudentGegenstandComponent implements OnInit {
 
 
   sortByStudentName(a: Student, b: Student) {
-      let aName = a.studentName.toLowerCase();
-      let bName = b.studentName.toLowerCase();
-      if (aName < bName) {
-        return -1;
-      } else if (aName > bName) {
-        return 1;
-      }
-      return 0;
+    let aName = a.studentName.toLowerCase();
+    let bName = b.studentName.toLowerCase();
+    if (aName < bName) {
+      return -1;
+    } else if (aName > bName) {
+      return 1;
+    }
+    return 0;
   }
 }

@@ -1,5 +1,5 @@
 <div *ngFor="let fach of fachListToDisplay, let fachIndex = index" style="display: inline-block; float: left;
-      margin-top: 50px; margin-left: 80px; width: 350px; background-color: #ebebeb;
+      margin-top: 3%; margin-left: 6.5%; width: 350px; background-color: #ebebeb;
        border-width: 3px; border-style: solid; border-color: black; text-align: center">
   <div style="border-color: black; border-style: double; border-width: 3px; margin:5px; width: 96%;"><div style="margin: 7px"><h4>Fach&nbsp;{{fach.fachName}}</h4></div></div>
   <div (click)="openAddDialog(fachIndex)" id="addDiv" class="addOrDeleteDiv">
@@ -54,17 +54,17 @@
     </div>
   </div>
 </div>
-<div style="text-align: center; border: 2px solid black;
-display:inline-block; float: left; margin: 40px;
-width: 400px; height: 250px;">
+<div *ngIf="fachListToDisplay" style="text-align: center; border: 5px solid black;
+display:inline-block; float: left; margin: 4%;
+width: 400px; height: 250px; background-color: #ebebeb;">
   <br>
-  <h3>Fach hinzufügen</h3>
+  <h3>Hinzufügen eines Fachs:</h3>
   <br>
   <mat-form-field [style.width.px]=200>
     <input matInput autocomplete="off" id="fach" [(ngModel)]="fach.fachName"
            name="fach" type="text" placeholder="Gib einen Fachnamen ein">
   </mat-form-field>
-  <br>
+  <br><br>
   <button class="btn btn-info" (click)="fachErstellen()">Fach Erstellen</button>
 </div>
 <div data-keyboard="false" data-backdrop="static" class="modal" id="modal" tabindex="-1" role="dialog"

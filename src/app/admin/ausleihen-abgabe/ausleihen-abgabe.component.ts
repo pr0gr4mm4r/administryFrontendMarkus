@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import {Component, OnInit} from '@angular/core';
 import {StudentService} from "../../services/student/student.service";
 import {AusleihenAbgebenService} from "../../services/ausleihenAbgeben/ausleihen-abgeben.service";
 import {Student} from "../../model/student/student";
@@ -14,14 +14,28 @@ export class AusleihenAbgabeComponent implements OnInit {
 
   ausleihenAbgebenList: AusleihenAbgeben[] = [];
 
-  constructor(private ausleihenAbgebenService: AusleihenAbgebenService) { }
+  constructor(private ausleihenAbgebenService: AusleihenAbgebenService) {
+  }
 
   ngOnInit(): void {
-    this.ausleihenAbgebenService.getAll().subscribe(ausleihenAbgeben => this.ausleihenAbgebenList = ausleihenAbgeben);
+    this.ausleihenAbgebenService.getAll().subscribe(ausleihenAbgeben => {
+        this.ausleihenAbgebenList = ausleihenAbgeben;
+        for (let i = 0; i < this.ausleihenAbgebenList.length; i++) {
+          let basicDate = this.ausleihenAbgebenList[i].datum;
+          let datumString = new Date(basicDate).toLocaleDateString("de-DE");
+          let basicDateToString = basicDate.toString();
+          let timeString = basicDateToString.replace(
+            "T", " ").substring(10, basicDateToString.length - 11);
+          // @ts-ignore
+          this.ausleihenAbgebenList[i].datum = datumString + timeString;
+        }
+      }
+    );
+
   }
 
   sortByFachNameExecution() {
-  this.ausleihenAbgebenList.sort(((a, b) => this.sortByFachName(a.fach, b.fach)))
+    this.ausleihenAbgebenList.sort(((a, b) => this.sortByFachName(a.fach, b.fach)))
   }
 
   sortByFachName(a: Fach, b: Fach) {
@@ -35,9 +49,9 @@ export class AusleihenAbgabeComponent implements OnInit {
     return 0;
   }
 
-  sortByStudentNameExecution(){
+  sortByStudentNameExecution() {
     this.ausleihenAbgebenList.sort(
-      (a,b) => this.sortByStudentName(a.student, b.student));
+      (a, b) => this.sortByStudentName(a.student, b.student));
   }
 
   sortByStudentName(a: Student, b: Student) {
@@ -51,4 +65,11 @@ export class AusleihenAbgabeComponent implements OnInit {
     return 0;
   }
 
+  sortByDateExectution() {
+    this.ausleihenAbgebenList.sort(((a, b) => this.sortByDate(a.ausleihenAbgebenId, b.ausleihenAbgebenId)))
+  }
+
+  sortByDate(a: number, b: number) {
+    return a - b;
+  }
 }
