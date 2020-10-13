@@ -14,33 +14,46 @@ export class AusleihenAbgabeComponent implements OnInit {
 
   ausleihenAbgebenList: AusleihenAbgeben[] = [];
 
+
   constructor(private ausleihenAbgebenService: AusleihenAbgebenService) {
   }
 
   ngOnInit(): void {
     this.ausleihenAbgebenService.getAll().subscribe(ausleihenAbgeben => {
-        this.ausleihenAbgebenList = ausleihenAbgeben;
-        for (let i = 0; i < this.ausleihenAbgebenList.length; i++) {
-          let basicDate = this.ausleihenAbgebenList[i].datum;
-          let datumString = new Date(basicDate).toLocaleDateString("de-DE");
-          let basicDateToString = basicDate.toString();
-          let timeString = basicDateToString.replace(
-            "T", " ").substring(10, basicDateToString.length - 11);
-          // @ts-ignore
-          this.ausleihenAbgebenList[i].datum = datumString + timeString;
-        }
+      this.ausleihenAbgebenList = ausleihenAbgeben;
+      for (let i = 0; i < this.ausleihenAbgebenList.length; i++) {
+        let basicDate = this.ausleihenAbgebenList[i].datum;
+        let datumString = new Date(basicDate).toLocaleDateString("de-DE");
+        let basicDateToString = basicDate.toString();
+        let timeString = basicDateToString.replace(
+          "T", " ").substring(10, basicDateToString.length - 11);
+        // @ts-ignore
+        this.ausleihenAbgebenList[i].datum = datumString + timeString;
       }
-    );
+
+    });
 
   }
 
   sortByFachNameExecution() {
-    this.ausleihenAbgebenList.sort(((a, b) => this.sortByFachName(a.fach, b.fach)))
+    this.ausleihenAbgebenList.sort(
+      ((a, b) => this.sortByFachName1(a.fach, b.fach)));
   }
 
-  sortByFachName(a: Fach, b: Fach) {
-    let aName = a.fachName.toLowerCase();
-    let bName = b.fachName.toLowerCase();
+  sortByFachName1(a: Fach, b: Fach) {
+    let aName = a.fachName.replace(/\D/g, '');
+    let bName = b.fachName.replace(/\D/g, '');
+    if (Number.parseInt(aName) < Number.parseInt(bName)) {
+      return -1;
+    } else if (Number.parseInt(aName) > Number.parseInt(bName)) {
+      return 1;
+    }
+    return 0;
+  }
+
+  sortByFachName2(a: Fach, b: Fach) {
+    let aName = a.fachName.replace(/[0-9]/g, '').toLowerCase();
+    let bName = b.fachName.replace(/[0-9]/g, '').toLowerCase();
     if (aName < bName) {
       return -1;
     } else if (aName > bName) {

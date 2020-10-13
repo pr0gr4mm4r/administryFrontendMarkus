@@ -19,7 +19,9 @@ export class OverviewComponent implements OnInit {
   addDialogBool: boolean;
   ausleihenBool: boolean;
   fachnummerNameAnzahlMapMap: Map<String, Map<String, number>>;
-  gegenstandToAdd: Gegenstand = new Gegenstand();
+  gegenstandListToAdd: Gegenstand[] = [];
+  initialGegenstandListToDelete: Gegenstand[] = [];
+  currentGegenstandListToDelete: Gegenstand[] = [];
   gegenstandListToAusleihen: Gegenstand[] = [];
   gegenstandListToAbgeben: Gegenstand[] = [];
   currentFachName: String = "";
@@ -31,7 +33,9 @@ export class OverviewComponent implements OnInit {
   student: Student = new Student();
   weiterBool: boolean;
   studentFachGegenstandList: Gegenstand[] = [];
-  fach: Fach = new Fach();
+  fachToAdd: Fach = new Fach();
+  fachToDelete: Fach = new Fach();
+  different: boolean = false;
 
   constructor(private gegenstandService: GegenstandService,
               private fachService: FachService,
@@ -43,10 +47,10 @@ export class OverviewComponent implements OnInit {
   ngOnInit(): void {
     this.prepareRouter();
     this.retrieveFachList();
+    this.resetGegenstandListToAdd();
   }
 
   retrieveFachList() {
-    this.gegenstandToAdd.fach = new Fach();
     this.fachService.retrieve().subscribe(response => {
       this.fachList = response.filter(fach => fach.fachName !== "Pool");
       this.fachnummerNameAnzahlMapMap = new Map<String, Map<String, number>>();
@@ -101,7 +105,6 @@ export class OverviewComponent implements OnInit {
         }
       }
     });
-
   }
 
   activateModal() {
@@ -119,22 +122,24 @@ export class OverviewComponent implements OnInit {
   }
 
   openDeleteDialog(fachIndex: number) {
-    this.addDialogBool = false;
+    this.currentFachName = [...this.fachList][fachIndex].fachName;
     this.currentFachIndex = fachIndex;
+    this.currentGegenstandListToDelete
+    this.setGegenstandLists();
+    this.addDialogBool = false;
     this.activateModal();
   }
 
-  deleteGegenstand(index: number) {
-    let fachId: number =
-      this.fachList.find(fach => fach.fachName === this.fachListToDisplay[
-        this.currentFachIndex].fachName).fachId;
-    let gegenstandName = this.fachListToDisplay[
-      this.currentFachIndex].gegenstandList[index].gegenstandName;
-    let gegenstandId: number = this.fachList.find(
-      fach => fach.fachId === fachId).gegenstandList.find(
-      gegenstand => gegenstand.gegenstandName === gegenstandName
-    ).gegenstandId;
-    this.gegenstandService.delete(gegenstandId).subscribe(
+  deleteGegenstandListNachMengenAngabe() {
+   for (let i = 0; i < this.currentGegenstandListToDelete.length; i++) {
+      if (this.currentGegenstandListToDelete[i].menge === this.initialGegenstandListToDelete[i].menge) {
+        this.currentGegenstandListToDelete[i].menge = -1;
+      }
+    }
+    this.currentGegenstandListToDelete = this.currentGegenstandListToDelete.filter(
+      gegenstand => gegenstand.menge !== -1);
+
+   this.gegenstandService.delete(this.currentGegenstandListToDelete, this.currentFachName).subscribe(
       success => {
         if (success) {
           this.router.navigate(['overview']);
@@ -148,7 +153,7 @@ export class OverviewComponent implements OnInit {
 
   addGegenstand() {
     this.gegenstandService.add(
-      this.gegenstandToAdd.gegenstandName, this.currentFachName, this.menge).subscribe(
+      this.gegenstandListToAdd, [this.currentFachName]).subscribe(
       message => {
         if (message === "Erfolgreiches Speichern") {
           this.router.navigate(['overview']);
@@ -217,11 +222,22 @@ export class OverviewComponent implements OnInit {
     }
   }
 
+  setGegenstandLists() {
+    this.currentGegenstandListToDelete =
+      this.fachListToDisplay[this.currentFachIndex].gegenstandList.filter(
+        gegenstand => gegenstand.ausgeliehen === false);
+    this.initialGegenstandListToDelete = JSON.parse(JSON.stringify(
+      this.fachListToDisplay[this.currentFachIndex].gegenstandList.filter(
+        gegenstand => gegenstand.ausgeliehen === false)));
+  }
+
   disableBools() {
     this.fachList[this.currentFachIndex].gegenstandList.forEach(gegenstand => gegenstand.selected = false);
+    this.different = false;
     this.gegenstandListToAbgeben = [];
     this.weiterBool = false;
     this.ausleihenBool = false;
+    this.resetGegenstandListToAdd();
   }
 
   getGegenstandListVonStudent() {
@@ -268,6 +284,61 @@ export class OverviewComponent implements OnInit {
   }
 
   fachErstellen() {
-    this.fachService.add(this.fach).subscribe();
+    this.fachService.add(this.fachToAdd).subscribe(success => {
+        this.router.navigate(['/']);
+      }, error => {
+        alert("Fachname schon vergeben oder anderer Fehler!");
+      }
+    );
+  }
+
+  addDuringAddingProcess() {
+    const gegenstand = new Gegenstand();
+    gegenstand.menge = 1;
+    this.gegenstandListToAdd.push(gegenstand);
+  }
+
+  deleteDuringAddingProcess() {
+    this.gegenstandListToAdd.pop();
+  }
+
+  checkIfGegenstandAddListIsFilled(): boolean {
+    for (let i = 0; i < this.gegenstandListToAdd.length; i++) {
+      if (!this.gegenstandListToAdd[i].gegenstandName) {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  fachEntfernen() {
+    if (this.fachToDelete.leer) {
+      //  this.fachService.add(this.fachToDelete);
+    }
+  }
+
+  resetGegenstandListToAdd() {
+    this.gegenstandListToAdd = [];
+    const gegenstand = new Gegenstand();
+    gegenstand.menge = 1;
+    this.gegenstandListToAdd.push(gegenstand);
+  }
+
+  compareInitialDeleteListToCurrent(i: number) {
+    let currentGegenstandMenge = this.currentGegenstandListToDelete[i].menge;
+    let initialGegenstandMenge = this.initialGegenstandListToDelete[i].menge;
+    if (currentGegenstandMenge > initialGegenstandMenge) {
+      this.currentGegenstandListToDelete[i].menge = initialGegenstandMenge;
+    }
+    if (currentGegenstandMenge < 0) {
+      this.currentGegenstandListToDelete[i].menge = 0;
+    }
+    for (let i = 0; i < this.currentGegenstandListToDelete.length; i++) {
+      if (this.currentGegenstandListToDelete[i].menge !== this.initialGegenstandListToDelete[i].menge) {
+        this.different = true;
+        return
+      }
+      this.different = false;
+    }
   }
 }

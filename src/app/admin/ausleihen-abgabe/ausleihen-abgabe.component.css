@@ -4,8 +4,12 @@
 }
 .clickable:hover{
   cursor: pointer;
-  background-color: orange;
-}
+  color: white;
+  font-weight: normal;
+  background-color: black;
+  border-top-color: black;
+  border-left-color: black;
+  border-right-color: black}
 .material-icons {
   vertical-align: middle;
 }

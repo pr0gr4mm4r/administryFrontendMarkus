@@ -1,6 +1,6 @@
 <div style="text-align: center; margin: 50px">
-  <div>
-    <mat-form-field [style.width.px]=500>
+  <div style="margin: 2%">
+    <mat-form-field [style.width.px]=400>
       <input matInput autocomplete="off" (input)="updateAktuelleGeg()"
              id="search" [(ngModel)]="suche"
              name="search" type="text" placeholder="Suche Gegenstand">
@@ -12,6 +12,7 @@
       <tr>
         <th>Gegenstand</th>
         <th>Fach</th>
+        <th>Student</th>
       </tr>
       </thead>
       <tbody>
@@ -21,6 +22,9 @@
         </td>
         <td>
           {{nurFachNummer(option.toString())}}
+        </td>
+        <td>
+          {{nurStudentName(option.toString())}}
         </td>
       </tr>
       </tbody>

@@ -1,7 +1,8 @@
 import { Injectable } from '@angular/core';
-import {HttpClient, HttpHeaders} from "@angular/common/http";
+import {HttpClient} from "@angular/common/http";
 import {Observable} from "rxjs";
 import {environment} from "../../../environments/environment";
+import {Gegenstand} from "../../model/gegenstand/gegenstand";
 
 @Injectable({
   providedIn: 'root'
@@ -10,12 +11,12 @@ export class GegenstandService {
 
   constructor(private http: HttpClient) { }
 
-  add(gegenstandName: String, fachId: String, menge: number): Observable<String> {
-    return this.http.post<String>(environment.apiUrl + '/gegenstand/add/', [gegenstandName, fachId, menge],
+  add(gegenstandNameList: Gegenstand[], fachId: String[]): Observable<String> {
+    return this.http.post<String>(environment.apiUrl + '/gegenstand/add/', [gegenstandNameList, fachId],
       { responseType: "text" as 'json'});
   }
 
-  delete(gegenstandId: number): Observable<String> {
-    return this.http.delete<String>(environment.apiUrl + '/gegenstand/delete/' + gegenstandId);
+  delete(gegenstandList: Gegenstand[], fachName: String): Observable<any> {
+    return this.http.put<any>(environment.apiUrl + '/gegenstand/delete/' + fachName, gegenstandList);
   }
 }
