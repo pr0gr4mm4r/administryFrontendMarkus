@@ -7,5 +7,4 @@ export class Gegenstand {
   menge: number;
   ausgeliehen: boolean;
   selected: boolean;
-  category: String;
 }

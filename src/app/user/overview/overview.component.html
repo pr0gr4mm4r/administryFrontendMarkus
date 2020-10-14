@@ -1,15 +1,18 @@
 <div style="text-align: center; margin-top: 2.3%;">
   <div style="display: inline-block; margin-right: 2%;">
-    <button class="btn btn-dark">Kameras</button>
+    <div id="categoryAlle" (click)="setCategoryAlle()" class="categoryDivs">Alle</div>
   </div>
   <div style="display: inline-block; margin-right: 2%;">
-    <button class="btn btn-dark">Aufnahmegeräte</button>
+    <div id="categoryKameras" (click)="setCategoryKameras()" class="categoryDivs">Kameras</div>
   </div>
   <div style="display: inline-block; margin-right: 2%;">
-    <button class="btn btn-dark">Mikrofone</button>
+    <div id="categoryRekorder" (click)="setCategoryRekorder()" class="categoryDivs">Aufnahmegeräte</div>
   </div>
-  <div style="display: inline-block;">
-    <button class="btn btn-dark"> Licht</button>
+  <div style="display: inline-block; margin-right: 2%;">
+    <div id="categoryMikrofone" (click)="setCategoryMikrofone()" class="categoryDivs">Mikrofone</div>
+  </div>
+  <div style="display: inline-block; ">
+    <div id="categoryLicht" (click)="setCategoryLicht()" class="categoryDivs">Licht</div>
   </div>
 </div>
 <div style="overflow: hidden; margin-bottom: 4.5%; margin-top: 3.3%">
@@ -21,13 +24,18 @@
        margin-top:2%; margin-left: 2%; margin-right: 2%; width: 96%;">
         <div style="margin:2%"><h4>Fach&nbsp;{{fach.fachName}}</h4></div>
       </div>
-      <div (click)="openAddDialog(fachIndex)" id="addDiv" class="addOrDeleteDiv">
-        <div style="padding: 1%">
-          <mat-icon>queue</mat-icon>
+      <div (click)="openAddDialog(fachIndex)" id="addDiv" class="addOrDeleteOrEditDiv">
+        <div>
+          <mat-icon>add_box</mat-icon>
         </div>
       </div>
-      <div (click)="openDeleteDialog(fachIndex)" id="deleteDiv" class="addOrDeleteDiv">
-        <div style="padding: 1%">
+      <div (click)="openEditDialog(fachIndex)" id="categoryDiv" class="addOrDeleteOrEditDiv">
+        <div>
+          <mat-icon>edit</mat-icon>
+        </div>
+      </div>
+      <div (click)="openDeleteDialog(fachIndex)" id="deleteDiv" class="addOrDeleteOrEditDiv">
+        <div>
           <mat-icon>delete</mat-icon>
         </div>
       </div>
@@ -61,20 +69,20 @@
           </ng-container>
         </div>
       </ng-container>
-      <div class="addOrDeleteDiv">
-        <div style="padding: 1%" class="ausleihenDiv"
+      <div class="ausleihenAbgebenDiv">
+        <div style="padding: 1%"
              (click)="ausleihenOpen(fachIndex)">
           Ausleihen
         </div>
       </div>
-      <div class="addOrDeleteDiv">
-        <div style="padding: 1%" class="ausleihenDiv"
+      <div class="ausleihenAbgebenDiv">
+        <div style="padding: 1%"
              (click)="abgebenOpen(fachIndex)">
           Rückgabe
         </div>
       </div>
     </div>
-    <div *ngIf="fachListToDisplay" style="text-align: center; border: 5px solid black;
+    <div style="text-align: center; border: 5px solid black;
 display:inline-block; float: left;  margin-left: 6.5%;
 width: 25%; height: 250px; background-color: #ebebeb; clear: both">
       <br>
@@ -84,10 +92,11 @@ width: 25%; height: 250px; background-color: #ebebeb; clear: both">
         <input matInput autocomplete="off" id="fachHinzufügen" [(ngModel)]="fachToAdd.fachName"
                name="fach" type="text" placeholder="Gib einen Fachnamen ein:">
       </mat-form-field>
-      <br><br>
-      <button class="btn btn-info" (click)="fachErstellen()">Fach Erstellen</button>
+      <div class="addDeleteDivs" (click)="fachErstellen()">Fach
+        Erstellen
+      </div>
     </div>
-    <div *ngIf="fachListToDisplay" style="text-align: center; border: 5px solid black;
+    <div style="text-align: center; border: 5px solid black;
 display:inline-block; float: left;  margin-left: 6.5%;
 width: 25%; height: 250px; background-color: #ebebeb;">
       <br>
@@ -97,11 +106,14 @@ width: 25%; height: 250px; background-color: #ebebeb;">
         <input matInput autocomplete="off" id="fachLöschen" [(ngModel)]="fachToDelete.fachName"
                name="fach" type="text" placeholder="Gib einen Fachnamen ein:">
       </mat-form-field>
-      <br><br>
-      <button class="btn btn-info" (click)="fachEntfernen()">Fach Löschen</button>
+
+      <div class="addDeleteDivs" (click)="fachEntfernen()">
+        Fach Löschen
+      </div>
     </div>
   </div>
 </div>
+<!--HINZUFÜGEN/ LÖSCHEN-->
 <div data-keyboard="false" data-backdrop="static" class="modal"
      id="modal" tabindex="-1" role="dialog"
      aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
@@ -110,14 +122,14 @@ width: 25%; height: 250px; background-color: #ebebeb;">
     <div class="modal-content">
       <div class="modal-header text-center">
         <h5 class="modal-title w-100" id="exampleModalLongTitle">
-          <span *ngIf="addDialogBool">Gegenstand Hinzufügen</span>
-          <span *ngIf="!addDialogBool">Gegenstand Löschen</span>
+          <span *ngIf="addDialogBool">Gegenstände Hinzufügen</span>
+          <span *ngIf="!addDialogBool">Gegenstände dem Pool Hinzufügen</span>
         </h5>
         <button type="button" class="close" data-dismiss="modal" aria-label="Close" (click)="disableBools()">
           <span aria-hidden="true">&times;</span>
         </button>
       </div>
-      <div id="wrapper">
+      <div class="wrapper">
         <ng-container *ngIf="addDialogBool">
           <div class="modal-body">
             <mat-form-field [style.width.px]=240 ngDefaultControl>
@@ -166,28 +178,29 @@ width: 25%; height: 250px; background-color: #ebebeb;">
                 <mat-form-field [style.width.px]=40 ngDefaultControl>
                   <input (input)="compareInitialDeleteListToCurrent(i)" matInput id="mng{{i}}"
                          [(ngModel)]="gegenstand.menge" name="meng{{i}}" type="number" placeholder="Menge"
-                         max="{{initialGegenstandListToDelete[i].menge}}" min="0" >
+                         max="{{initialGegenstandListToDelete[i].menge}}" min="0">
                 </mat-form-field>
               </div>
             </div>
           </div>
         </ng-container>
       </div>
+
       <div class="modal-footer">
         <button *ngIf="addDialogBool" [disabled]="checkIfGegenstandAddListIsFilled()"
                 style="margin-right: 15px" class="btn btn-info" (click)="addGegenstand()">
-          Zum Bestand Hinzufügen
+          Gegenstände zu Fach {{fachListToDisplay[currentFachIndex].fachName}} hinzufügen
         </button>
         <button *ngIf="!addDialogBool" [disabled]="!different"
                 style="margin-right: 15px" class="btn btn-info"
                 (click)="deleteGegenstandListNachMengenAngabe()">
-          Löschen
+          Zum Pool Hinzufügen
         </button>
-        <button type="button" class="btn btn-secondary" data-dismiss="modal" (click)="disableBools()">Close</button>
       </div>
     </div>
   </div>
 </div>
+<!--AUSLEIHEN-->
 <div data-keyboard="false" data-backdrop="static" class="modal" id="modal2" tabindex="-1" role="dialog"
      aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
   <div class="modal-dialog modal-dialog-centered" role="document">
@@ -201,7 +214,7 @@ width: 25%; height: 250px; background-color: #ebebeb;">
           <span aria-hidden="true">&times;</span>
         </button>
       </div>
-      <div id="wrapper2">
+      <div class="wrapper">
         <ng-container *ngIf="!ausleihenBool && benutzerDatenBool">
           <div class="modal-body">
             <mat-form-field [style.width.px]=250 ngDefaultControl>
@@ -265,8 +278,39 @@ width: 25%; height: 250px; background-color: #ebebeb;">
           class="btn btn-info" (click)="abgeben()">
           Abgeben
         </button>
-        <button type="button" class="btn btn-secondary" data-dismiss="modal"
-                (click)="disableBools()">Close
+      </div>
+    </div>
+  </div>
+</div>
+<!--EDITIEREN-->
+<div data-keyboard="false" data-backdrop="static" class="modal" id="modal3" tabindex="-1" role="dialog"
+     aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h5 class="modal-title w-100" id="exampleModalLongTitle3">
+          <span>Auswählen der Kategorie für Fach {{currentFachName}}</span>
+        </h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close" (click)="disableBools()">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="wrapper">
+        <div style="overflow:hidden;">
+          <div *ngFor="let category of categoryList, let i = index">
+            <div style="padding: 1%; cursor: pointer" (click)="setSelectedCategory(i)"
+                 [ngClass]="{'categorySelected' : category.selected}">
+              {{category.categoryName}}
+            </div>
+          </div>
+        </div>
+      </div>
+      <!-- highlight keyboard_voice videocam fiber_manual_record-->
+      <div class="modal-footer">
+        <button
+          style="margin-right: 15px"
+          class="btn btn-info" data-dismiss="modal" (click)="setCategoryForFach()">
+          Kategorie für Fach {{fachListToDisplay[currentFachIndex].fachName}} festlegen
         </button>
       </div>
     </div>

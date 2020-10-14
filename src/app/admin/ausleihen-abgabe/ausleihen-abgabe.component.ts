@@ -35,32 +35,16 @@ export class AusleihenAbgabeComponent implements OnInit {
 
   }
 
-  sortByFachNameExecution() {
-    this.ausleihenAbgebenList.sort(
-      ((a, b) => this.sortByFachName1(a.fach, b.fach)));
-  }
-
   sortByFachName1(a: Fach, b: Fach) {
-    let aName = a.fachName.replace(/\D/g, '');
-    let bName = b.fachName.replace(/\D/g, '');
-    if (Number.parseInt(aName) < Number.parseInt(bName)) {
-      return -1;
-    } else if (Number.parseInt(aName) > Number.parseInt(bName)) {
-      return 1;
-    }
-    return 0;
-  }
-
-  sortByFachName2(a: Fach, b: Fach) {
-    let aName = a.fachName.replace(/[0-9]/g, '').toLowerCase();
-    let bName = b.fachName.replace(/[0-9]/g, '').toLowerCase();
+    let aName = a.fachName.toString();
+    let bName = b.fachName.toString();
     if (aName < bName) {
       return -1;
     } else if (aName > bName) {
       return 1;
     }
     return 0;
-  }
+    }
 
   sortByStudentNameExecution() {
     this.ausleihenAbgebenList.sort(
@@ -84,5 +68,10 @@ export class AusleihenAbgabeComponent implements OnInit {
 
   sortByDate(a: number, b: number) {
     return a - b;
+  }
+
+  sortByFachNameExecution() {
+    this.ausleihenAbgebenList.sort(((a, b) => this.sortByFachName1(a.fach, b.fach)))
+
   }
 }

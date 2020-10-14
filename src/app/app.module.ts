@@ -1,7 +1,7 @@
-import { BrowserModule } from '@angular/platform-browser';
-import { NgModule } from '@angular/core';
+import {BrowserModule} from '@angular/platform-browser';
+import {NgModule} from '@angular/core';
 
-import { AppComponent } from './app.component';
+import {AppComponent} from './app.component';
 import {HttpClientModule} from "@angular/common/http";
 import {UiModule} from "./ui/ui.module";
 import {UserModule} from "./user/user.module";
@@ -11,6 +11,7 @@ import {GegenstandService} from "./services/gegenstand/gegenstand.service";
 import {FachService} from "./services/fach/fach.service";
 import {StudentService} from "./services/student/student.service";
 import {AusleihenAbgebenService} from "./services/ausleihenAbgeben/ausleihen-abgeben.service";
+import {CategoryService} from "./services/kategorie/category.service";
 
 @NgModule({
   declarations: [
@@ -24,7 +25,12 @@ import {AusleihenAbgebenService} from "./services/ausleihenAbgeben/ausleihen-abg
     UiModule,
     AdminModule
   ],
-  providers: [GegenstandService, FachService, StudentService, AusleihenAbgebenService],
+  providers: [
+    GegenstandService, FachService,
+    StudentService, AusleihenAbgebenService,
+    CategoryService
+  ],
   bootstrap: [AppComponent]
 })
-export class AppModule { }
+export class AppModule {
+}

@@ -7,6 +7,8 @@ import {Router} from "@angular/router";
 import {Student} from "../../model/student/student";
 import {StudentService} from "../../services/student/student.service";
 import {AusleihenAbgebenService} from "../../services/ausleihenAbgeben/ausleihen-abgeben.service";
+import {Category} from "../../model/kategorie/category";
+import {CategoryService} from "../../services/kategorie/category.service";
 
 declare var $;
 
@@ -36,11 +38,13 @@ export class OverviewComponent implements OnInit {
   fachToAdd: Fach = new Fach();
   fachToDelete: Fach = new Fach();
   different: boolean = false;
+  categoryList: Category[];
 
   constructor(private gegenstandService: GegenstandService,
               private fachService: FachService,
               private studentService: StudentService,
               private auleihenAbgebenService: AusleihenAbgebenService,
+              private categoryService: CategoryService,
               private router: Router) {
   }
 
@@ -81,6 +85,9 @@ export class OverviewComponent implements OnInit {
         let fach = new Fach();
         fach.leer = false;
         fach.gegenstandList = [];
+        let category = new Category();
+        category.categoryName = " ";
+        fach.category = category;
         for (let j = 0; j < [...this.fachnummerNameAnzahlMapMap.values()][i].size; j++) {
           let gegenstand = new Gegenstand();
           let map: Map<String, number> = [...this.fachnummerNameAnzahlMapMap.values()][i];
@@ -104,6 +111,40 @@ export class OverviewComponent implements OnInit {
           this.fachListToDisplay[i].gegenstandList[j].ausgeliehen = mengeAusgeliehenFachList - mengeFachListToDisplay === 0;
         }
       }
+
+      this.categoryService.retrieve().subscribe(categoryList => {
+          this.categoryList = categoryList;
+          for (let i = 0; i < this.fachListToDisplay.length; i++) {
+            if (this.fachList[i].category !== null) {
+              this.fachListToDisplay[i].category = this.fachList[i].category;
+              continue;
+            }
+            let category = new Category();
+            category.categoryName = " ";
+            this.fachListToDisplay[i].category = category;
+          }
+          let categoryState = localStorage.getItem("category");
+          if (categoryState === "Beleuchtung") {
+            $("#categoryLicht").addClass("toggleBackgroundColor");
+          }
+          if (categoryState === "Mikrofone") {
+            $("#categoryMikrofone").addClass("toggleBackgroundColor");
+          }
+          if (categoryState === "Aufnahmegeräte") {
+            $("#categoryRekorder").addClass("toggleBackgroundColor");
+          }
+          if (categoryState === "Kameras") {
+            $("#categoryKameras").addClass("toggleBackgroundColor");
+          }
+          if (categoryState === "Alle" || categoryState === undefined) {
+            $("#categoryAlle").addClass("toggleBackgroundColor");
+          }
+          if (categoryState !== "Alle" && categoryState !== undefined) {
+            console.log(this.fachListToDisplay.map(fach => fach.category));
+            this.fachListToDisplay = this.fachListToDisplay.filter(fach => fach.category.categoryName.includes(categoryState));
+          }
+        }
+      );
     });
   }
 
@@ -115,23 +156,36 @@ export class OverviewComponent implements OnInit {
     $('#modal2').modal();
   }
 
-  openAddDialog(index: number) {
-    this.currentFachName = [...this.fachList][index].fachName;
+  activateModal3() {
+    $('#modal3').modal();
+  }
+
+  openAddDialog(fachIndex: number) {
+    this.updateCurrentFachAndIndex(fachIndex);
     this.addDialogBool = true;
     this.activateModal();
   }
 
+  openEditDialog(fachIndex: number) {
+    this.updateCurrentFachAndIndex(fachIndex);
+    this.activateModal3();
+  }
+
   openDeleteDialog(fachIndex: number) {
-    this.currentFachName = [...this.fachList][fachIndex].fachName;
-    this.currentFachIndex = fachIndex;
+    this.updateCurrentFachAndIndex(fachIndex);
     this.currentGegenstandListToDelete
     this.setGegenstandLists();
     this.addDialogBool = false;
     this.activateModal();
   }
 
+  updateCurrentFachAndIndex(fachIndex: number) {
+    this.currentFachName = [...this.fachList][fachIndex].fachName;
+    this.currentFachIndex = fachIndex;
+  }
+
   deleteGegenstandListNachMengenAngabe() {
-   for (let i = 0; i < this.currentGegenstandListToDelete.length; i++) {
+    for (let i = 0; i < this.currentGegenstandListToDelete.length; i++) {
       if (this.currentGegenstandListToDelete[i].menge === this.initialGegenstandListToDelete[i].menge) {
         this.currentGegenstandListToDelete[i].menge = -1;
       }
@@ -139,7 +193,7 @@ export class OverviewComponent implements OnInit {
     this.currentGegenstandListToDelete = this.currentGegenstandListToDelete.filter(
       gegenstand => gegenstand.menge !== -1);
 
-   this.gegenstandService.delete(this.currentGegenstandListToDelete, this.currentFachName).subscribe(
+    this.gegenstandService.delete(this.currentGegenstandListToDelete, this.currentFachName).subscribe(
       success => {
         if (success) {
           this.router.navigate(['overview']);
@@ -284,12 +338,14 @@ export class OverviewComponent implements OnInit {
   }
 
   fachErstellen() {
-    this.fachService.add(this.fachToAdd).subscribe(success => {
-        this.router.navigate(['/']);
-      }, error => {
-        alert("Fachname schon vergeben oder anderer Fehler!");
-      }
-    );
+    if(this.fachToAdd.fachName){
+      this.fachService.add(this.fachToAdd).subscribe(success => {
+          this.router.navigate(['/']);
+        }, error => {
+          alert("Fachname schon vergeben oder anderer Fehler!");
+        }
+      );
+    }
   }
 
   addDuringAddingProcess() {
@@ -299,7 +355,9 @@ export class OverviewComponent implements OnInit {
   }
 
   deleteDuringAddingProcess() {
-    this.gegenstandListToAdd.pop();
+    if (this.gegenstandListToAdd.length > 1) {
+      this.gegenstandListToAdd.pop();
+    }
   }
 
   checkIfGegenstandAddListIsFilled(): boolean {
@@ -340,5 +398,46 @@ export class OverviewComponent implements OnInit {
       }
       this.different = false;
     }
+  }
+
+  setCategoryKameras() {
+    $(".categoryDivs").removeClass("toggleBackgroundColor");
+    localStorage.setItem("category", "Kameras");
+    this.router.navigate(['overview']);
+  }
+
+  setCategoryRekorder() {
+    localStorage.setItem("category", "Aufnahmegeräte");
+    this.router.navigate(['overview']);
+  }
+
+  setCategoryMikrofone() {
+    localStorage.setItem("category", "Mikrofone");
+    this.router.navigate(['overview']);
+  }
+
+  setCategoryLicht() {
+    localStorage.setItem("category", "Beleuchtung");
+    this.router.navigate(['overview']);
+  }
+
+  setCategoryAlle() {
+    localStorage.setItem("category", "Alle");
+    this.router.navigate(['overview']);
+  }
+
+  setCategoryForFach() {
+    let category = this.categoryList.find(category => category.selected);
+    this.categoryService.setFachsCategory(this.currentFachName, category.categoryId).subscribe(success => {
+      this.router.navigate(['/overview']);
+    }, error => {
+    })
+  }
+
+  setSelectedCategory(i: number) {
+    for (let j = 0; j < this.categoryList.length; j++) {
+      this.categoryList[j].selected = false;
+    }
+    this.categoryList[i].selected = true;
   }
 }
