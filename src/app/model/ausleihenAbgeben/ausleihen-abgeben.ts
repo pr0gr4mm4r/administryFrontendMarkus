@@ -7,6 +7,6 @@ export class AusleihenAbgeben {
   student: Student;
   datum: Date = new Date();
   gegenstandList: Gegenstand[];
-  fach: Fach;
+  fachName: String;
   abgeben: boolean;
 }

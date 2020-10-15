@@ -20,6 +20,7 @@ declare var $;
 export class OverviewComponent implements OnInit {
   addDialogBool: boolean;
   ausleihenBool: boolean;
+  markMvpBool: boolean;
   fachnummerNameAnzahlMapMap: Map<String, Map<String, number>>;
   gegenstandListToAdd: Gegenstand[] = [];
   initialGegenstandListToDelete: Gegenstand[] = [];
@@ -38,7 +39,7 @@ export class OverviewComponent implements OnInit {
   fachToAdd: Fach = new Fach();
   fachToDelete: Fach = new Fach();
   different: boolean = false;
-  categoryList: Category[];
+  categoryList: Category[] = [];
 
   constructor(private gegenstandService: GegenstandService,
               private fachService: FachService,
@@ -88,16 +89,18 @@ export class OverviewComponent implements OnInit {
         let category = new Category();
         category.categoryName = " ";
         fach.category = category;
+        let map: Map<String, number> = new Map<String, number>();
         for (let j = 0; j < [...this.fachnummerNameAnzahlMapMap.values()][i].size; j++) {
           let gegenstand = new Gegenstand();
-          let map: Map<String, number> = [...this.fachnummerNameAnzahlMapMap.values()][i];
+          map = [...this.fachnummerNameAnzahlMapMap.values()][i];
           gegenstand.gegenstandName = [...map.keys()][j];
           fach.gegenstandList.push(gegenstand);
           fach.fachName = [...this.fachnummerNameAnzahlMapMap.keys()][i];
           gegenstand.menge = +[...map.values()][j];
         }
-        if ([...this.fachnummerNameAnzahlMapMap.values()][i].has(" ")) {
+        if (map.has(" ")) {
           fach.leer = true;
+
         }
         this.fachListToDisplay.push(fach);
       }
@@ -123,25 +126,20 @@ export class OverviewComponent implements OnInit {
             category.categoryName = " ";
             this.fachListToDisplay[i].category = category;
           }
+
           let categoryState = localStorage.getItem("category");
-          if (categoryState === "Beleuchtung") {
-            $("#categoryLicht").addClass("toggleBackgroundColor");
-          }
-          if (categoryState === "Mikrofone") {
-            $("#categoryMikrofone").addClass("toggleBackgroundColor");
-          }
-          if (categoryState === "Aufnahmegeräte") {
-            $("#categoryRekorder").addClass("toggleBackgroundColor");
-          }
-          if (categoryState === "Kameras") {
-            $("#categoryKameras").addClass("toggleBackgroundColor");
-          }
-          if (categoryState === "Alle" || categoryState === undefined) {
-            $("#categoryAlle").addClass("toggleBackgroundColor");
+          for (let i = 0; i < this.categoryList.length; i++) {
+            let loopCurrentCategoryName = this.categoryList[i].categoryName;
+            let categoryDiv = $("#category " + loopCurrentCategoryName);
+            if (loopCurrentCategoryName.includes(categoryState)) {
+              categoryDiv.addClass("toggleBackgroundColor");
+              continue;
+            }
+            categoryDiv.removeClass("toggleBackgroundColor");
           }
           if (categoryState !== "Alle" && categoryState !== undefined) {
-            console.log(this.fachListToDisplay.map(fach => fach.category));
-            this.fachListToDisplay = this.fachListToDisplay.filter(fach => fach.category.categoryName.includes(categoryState));
+            this.fachListToDisplay = this.fachListToDisplay.filter(
+              fach => fach.category.categoryName.includes(categoryState));
           }
         }
       );
@@ -173,10 +171,18 @@ export class OverviewComponent implements OnInit {
 
   openDeleteDialog(fachIndex: number) {
     this.updateCurrentFachAndIndex(fachIndex);
-    this.currentGegenstandListToDelete
-    this.setGegenstandLists();
+    this.setGegenstandListsToDelete();
     this.addDialogBool = false;
     this.activateModal();
+  }
+
+  openMarkMvpDialog(fachIndex: number) {
+    for (let i = 0; i < this.fachListToDisplay[this.currentFachIndex].gegenstandList.length; i++) {
+      this.fachListToDisplay[this.currentFachIndex].gegenstandList[i].mvp = false;
+    }
+    this.updateCurrentFachAndIndex(fachIndex);
+    this.markMvpBool = true;
+    this.activateModal3();
   }
 
   updateCurrentFachAndIndex(fachIndex: number) {
@@ -276,7 +282,7 @@ export class OverviewComponent implements OnInit {
     }
   }
 
-  setGegenstandLists() {
+  setGegenstandListsToDelete() {
     this.currentGegenstandListToDelete =
       this.fachListToDisplay[this.currentFachIndex].gegenstandList.filter(
         gegenstand => gegenstand.ausgeliehen === false);
@@ -287,10 +293,12 @@ export class OverviewComponent implements OnInit {
 
   disableBools() {
     this.fachList[this.currentFachIndex].gegenstandList.forEach(gegenstand => gegenstand.selected = false);
+    this.categoryList.forEach(category => category.selected = false);
     this.different = false;
     this.gegenstandListToAbgeben = [];
     this.weiterBool = false;
     this.ausleihenBool = false;
+    this.markMvpBool = false;
     this.resetGegenstandListToAdd();
   }
 
@@ -338,7 +346,7 @@ export class OverviewComponent implements OnInit {
   }
 
   fachErstellen() {
-    if(this.fachToAdd.fachName){
+    if (this.fachToAdd.fachName) {
       this.fachService.add(this.fachToAdd).subscribe(success => {
           this.router.navigate(['/']);
         }, error => {
@@ -370,8 +378,14 @@ export class OverviewComponent implements OnInit {
   }
 
   fachEntfernen() {
+    let fach = this.fachListToDisplay.find(
+      fach => fach.fachName === this.fachToDelete.fachName);
+    if (fach.leer) {
+      this.fachToDelete.leer = true;
+    }
     if (this.fachToDelete.leer) {
-      //  this.fachService.add(this.fachToDelete);
+      this.fachService.delete(this.fachToDelete.fachName).subscribe(success =>
+        this.router.navigate(['overview']));
     }
   }
 
@@ -400,44 +414,74 @@ export class OverviewComponent implements OnInit {
     }
   }
 
-  setCategoryKameras() {
-    $(".categoryDivs").removeClass("toggleBackgroundColor");
-    localStorage.setItem("category", "Kameras");
+  setCategory(index: number) {
+    let currentCategory = this.categoryList[index];
+    localStorage.setItem("category", currentCategory.categoryName.toString());
     this.router.navigate(['overview']);
-  }
-
-  setCategoryRekorder() {
-    localStorage.setItem("category", "Aufnahmegeräte");
-    this.router.navigate(['overview']);
-  }
-
-  setCategoryMikrofone() {
-    localStorage.setItem("category", "Mikrofone");
-    this.router.navigate(['overview']);
-  }
-
-  setCategoryLicht() {
-    localStorage.setItem("category", "Beleuchtung");
-    this.router.navigate(['overview']);
-  }
-
-  setCategoryAlle() {
-    localStorage.setItem("category", "Alle");
-    this.router.navigate(['overview']);
-  }
-
-  setCategoryForFach() {
-    let category = this.categoryList.find(category => category.selected);
-    this.categoryService.setFachsCategory(this.currentFachName, category.categoryId).subscribe(success => {
-      this.router.navigate(['/overview']);
-    }, error => {
-    })
   }
 
   setSelectedCategory(i: number) {
     for (let j = 0; j < this.categoryList.length; j++) {
       this.categoryList[j].selected = false;
+      if (this.categoryList[j].categoryId === this.categoryList[i].categoryId) {
+        this.categoryList[i].selected = true;
+      }
     }
-    this.categoryList[i].selected = true;
+  }
+
+  confirmCategoryForFach() {
+    let selectedCategory = this.categoryList.find(category => category.selected);
+    this.categoryService.setFachsCategory(
+      this.fachListToDisplay[this.currentFachIndex].fachName, selectedCategory.categoryId).subscribe(
+      success => {
+        this.router.navigate(['overview']);
+      }, error => {
+        alert("fail");
+      }
+    );
+  }
+
+  setSelectedGegenstandToMvp(index: number) {
+    let gegenstandList = this.fachListToDisplay[this.currentFachIndex].gegenstandList;
+    for (let i = 0; i < gegenstandList.length; i++) {
+      gegenstandList[i].mvp = false;
+    }
+    gegenstandList[index].mvp = true;
+  }
+
+  oneSelectedAsMvp(): boolean {
+    for (let i = 0; i < this.fachListToDisplay[this.currentFachIndex].gegenstandList.length; i++) {
+      if (this.fachListToDisplay[this.currentFachIndex].gegenstandList[i].mvp) {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  oneSelectedAsCategory(): boolean {
+    for (let i = 0; i < this.categoryList.length; i++) {
+      if (this.categoryList[i].selected) {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  persistMvpAndSort() {
+    //this.gegenstandService.markMvp().subscribe();
+    for (let i = 0; i < this.fachListToDisplay.length; i++) {
+      this.fachListToDisplay[i].gegenstandList.sort(((a, b) => this.sortForMvp(a, b)));
+    }
+  }
+
+  sortForMvp(a: Gegenstand, b: Gegenstand) {
+    if (a.mvp) {
+      return -1;
+    }
+    if (!a.mvp) {
+      return 1;
+    }
+    return 0;
   }
 }
+

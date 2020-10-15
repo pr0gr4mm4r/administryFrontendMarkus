@@ -12,7 +12,7 @@ export class FachService {
   constructor(private http: HttpClient) { }
 
   add(fach: Fach): Observable<Fach> {
-    return this.http.post<Fach>(environment.apiUrl + '/fach/add/', fach);
+    return this.http.put<Fach>(environment.apiUrl + '/fach/add/', fach);
   }
 
   retrieve(): Observable<[Fach]> {
@@ -21,5 +21,9 @@ export class FachService {
 
   retrieveOne():Observable<Fach>{
     return this.http.get<Fach>(environment.apiUrl + '/fach/pool');
+  }
+
+  delete(fachName: String): Observable<boolean> {
+    return this.http.delete<boolean>(environment.apiUrl + '/fach/delete/' + fachName);
   }
 }

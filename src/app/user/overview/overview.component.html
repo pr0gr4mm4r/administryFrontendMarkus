@@ -1,18 +1,9 @@
-<div style="text-align: center; margin-top: 2.3%;">
-  <div style="display: inline-block; margin-right: 2%;">
-    <div id="categoryAlle" (click)="setCategoryAlle()" class="categoryDivs">Alle</div>
-  </div>
-  <div style="display: inline-block; margin-right: 2%;">
-    <div id="categoryKameras" (click)="setCategoryKameras()" class="categoryDivs">Kameras</div>
-  </div>
-  <div style="display: inline-block; margin-right: 2%;">
-    <div id="categoryRekorder" (click)="setCategoryRekorder()" class="categoryDivs">Aufnahmegeräte</div>
-  </div>
-  <div style="display: inline-block; margin-right: 2%;">
-    <div id="categoryMikrofone" (click)="setCategoryMikrofone()" class="categoryDivs">Mikrofone</div>
-  </div>
-  <div style="display: inline-block; ">
-    <div id="categoryLicht" (click)="setCategoryLicht()" class="categoryDivs">Licht</div>
+<div
+  style="text-align: center; overflow: hidden; height:200px; width: 70%; margin-left: 18%; margin-right: 18%; margin-top: 2.3%; text-align: center; overflow: hidden">
+  <div *ngFor="let category of categoryList, let i = index" style=" float: left; margin: 2%;">
+    <div style=" margin-right: 2%;">
+      <div [attr.id]="'category ' + i" (click)="setCategory(i)" class="categoryDivs">{{category.categoryName}}</div>
+    </div>
   </div>
 </div>
 <div style="overflow: hidden; margin-bottom: 4.5%; margin-top: 3.3%">
@@ -76,6 +67,11 @@
         </div>
       </div>
       <div class="ausleihenAbgebenDiv">
+        <div style="padding: 1%" (click)="openMarkMvpDialog(fachIndex)">
+          <span class="material-icons">stars</span>
+        </div>
+      </div>
+      <div class="ausleihenAbgebenDiv">
         <div style="padding: 1%"
              (click)="abgebenOpen(fachIndex)">
           Rückgabe
@@ -106,7 +102,6 @@ width: 25%; height: 250px; background-color: #ebebeb;">
         <input matInput autocomplete="off" id="fachLöschen" [(ngModel)]="fachToDelete.fachName"
                name="fach" type="text" placeholder="Gib einen Fachnamen ein:">
       </mat-form-field>
-
       <div class="addDeleteDivs" (click)="fachEntfernen()">
         Fach Löschen
       </div>
@@ -129,9 +124,9 @@ width: 25%; height: 250px; background-color: #ebebeb;">
           <span aria-hidden="true">&times;</span>
         </button>
       </div>
-      <div class="wrapper">
+      <div class="wrapper modal-body">
         <ng-container *ngIf="addDialogBool">
-          <div class="modal-body">
+          <div>
             <mat-form-field [style.width.px]=240 ngDefaultControl>
               <input matInput autocomplete="off" id="fachnummer" [(ngModel)]="currentFachName"
                      name="fachnummer" type="text" placeholder="Gib eine Schließfachnummer an">
@@ -165,8 +160,7 @@ width: 25%; height: 250px; background-color: #ebebeb;">
           </div>
         </ng-container>
         <ng-container *ngIf="!addDialogBool">
-          <div class="modal-body"
-               *ngFor="let gegenstand of currentGegenstandListToDelete, let i = index">
+          <div *ngFor="let gegenstand of currentGegenstandListToDelete, let i = index">
             <div style="text-align: center; overflow: hidden;">
               <div style="display: inline-block; float: left; margin-left: 5%">
                 <mat-form-field [style.width.px]=370 ngDefaultControl>
@@ -185,7 +179,6 @@ width: 25%; height: 250px; background-color: #ebebeb;">
           </div>
         </ng-container>
       </div>
-
       <div class="modal-footer">
         <button *ngIf="addDialogBool" [disabled]="checkIfGegenstandAddListIsFilled()"
                 style="margin-right: 15px" class="btn btn-info" (click)="addGegenstand()">
@@ -216,33 +209,33 @@ width: 25%; height: 250px; background-color: #ebebeb;">
       </div>
       <div class="wrapper">
         <ng-container *ngIf="!ausleihenBool && benutzerDatenBool">
-          <div class="modal-body">
+          <div>
             <mat-form-field [style.width.px]=250 ngDefaultControl>
               <input matInput autocomplete="off" id="studentName1" [(ngModel)]="student.studentName"
-                     name="name" type="text" placeholder="Gib hier deinen Namen an">
+                     name="name" type="text" placeholder="Name des Studierenden">
             </mat-form-field>
             <mat-form-field [style.width.px]=255 ngDefaultControl>
               <input matInput autocomplete="off" id="studentTelefon1" [(ngModel)]="student.handyNummer"
-                     name="name" type="text" placeholder="Gib hier eine Telefonnummer an">
+                     name="name" type="text" placeholder="Telefonnummer des Studierenden">
             </mat-form-field>
           </div>
         </ng-container>
         <ng-container *ngIf="ausleihenBool && benutzerDatenBool">
-          <div class="modal-body">
+          <div>
             <mat-form-field [style.width.px]=250 ngDefaultControl>
               <input matInput autocomplete="off" id="studentName2" [(ngModel)]="student.studentName"
-                     name="name" type="text" placeholder="Gib hier deinen Namen an">
+                     name="name" type="text" placeholder="Name des Studierenden">
             </mat-form-field>
             <mat-form-field [style.width.px]=255 ngDefaultControl>
               <input matInput autocomplete="off" id="studentTelefon2" [(ngModel)]="student.handyNummer"
-                     name="name" type="text" placeholder="Gib hier eine Telefonnummer an">
+                     name="name" type="text" placeholder="Telefonnummer des Studierenden">
             </mat-form-field>
           </div>
         </ng-container>
         <ng-container *ngIf="!ausleihenBool && !benutzerDatenBool">
-          <div class="modal-body">
+          <div>
             <div *ngFor="let gegenstand of studentFachGegenstandList, let i = index">
-              <div class="gegenstandHoverDiv" (click)="addSelectedGegenstandToAbgeben(i)"
+              <div class="hoverItIn" (click)="addSelectedGegenstandToAbgeben(i)"
                    [ngClass]="{'selected2' : gegenstand.selected}">
                 {{gegenstand.gegenstandName}}
               </div>
@@ -250,9 +243,9 @@ width: 25%; height: 250px; background-color: #ebebeb;">
           </div>
         </ng-container>
         <ng-container *ngIf="ausleihenBool && !benutzerDatenBool">
-          <div class="modal-body"
-               *ngFor="let gegenstand of fachList[currentFachIndex]?.gegenstandList">
-            <div class="gegenstandHoverDiv" (click)="addSelectedGegenstandToAusleihen(gegenstand)"
+          <div
+            *ngFor="let gegenstand of fachList[currentFachIndex]?.gegenstandList">
+            <div class="hoverItIn" (click)="addSelectedGegenstandToAusleihen(gegenstand)"
                  [ngClass]="{'ausgeliehen' : !gegenstand.ausgeliehen,
                   'abgegeben' : gegenstand.ausgeliehen, 'selected' : gegenstand.selected}">
               <span>{{gegenstand.gegenstandName}}</span>
@@ -282,37 +275,57 @@ width: 25%; height: 250px; background-color: #ebebeb;">
     </div>
   </div>
 </div>
-<!--EDITIEREN-->
+
 <div data-keyboard="false" data-backdrop="static" class="modal" id="modal3" tabindex="-1" role="dialog"
      aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
   <div class="modal-dialog modal-dialog-centered" role="document">
     <div class="modal-content">
       <div class="modal-header text-center">
         <h5 class="modal-title w-100" id="exampleModalLongTitle3">
-          <span>Auswählen der Kategorie für Fach {{currentFachName}}</span>
+          <span *ngIf="!markMvpBool">Auswählen der Kategorie für Fach {{currentFachName}}</span>
+          <span *ngIf="markMvpBool">Favorit Auswählen</span>
         </h5>
         <button type="button" class="close" data-dismiss="modal" aria-label="Close" (click)="disableBools()">
           <span aria-hidden="true">&times;</span>
         </button>
       </div>
-      <div class="wrapper">
-        <div style="overflow:hidden;">
+      <div class="wrapper modal-body">
+        <ng-container *ngIf="!markMvpBool">
           <div *ngFor="let category of categoryList, let i = index">
-            <div style="padding: 1%; cursor: pointer" (click)="setSelectedCategory(i)"
+            <div class="hoverItIn" style="padding: 1%; cursor: pointer"
+                 (click)="setSelectedCategory(i)"
                  [ngClass]="{'categorySelected' : category.selected}">
               {{category.categoryName}}
             </div>
           </div>
-        </div>
+        </ng-container>
+        <ng-container *ngIf="markMvpBool">
+          <div
+            *ngFor="let gegenstand of fachListToDisplay[currentFachIndex].gegenstandList, let i = index">
+            <div class="hoverItIn" (click)="setSelectedGegenstandToMvp(i)" style="padding: 1%; cursor: pointer"
+                 [ngClass]="{'categorySelected' : gegenstand.mvp}">
+              {{gegenstand.gegenstandName}}
+            </div>
+          </div>
+        </ng-container>
       </div>
-      <!-- highlight keyboard_voice videocam fiber_manual_record-->
+
       <div class="modal-footer">
-        <button
-          style="margin-right: 15px"
-          class="btn btn-info" data-dismiss="modal" (click)="setCategoryForFach()">
-          Kategorie für Fach {{fachListToDisplay[currentFachIndex].fachName}} festlegen
-        </button>
+        <ng-container *ngIf="!markMvpBool && fachListToDisplay[currentFachIndex]">
+          <button (click)="confirmCategoryForFach()"
+            style="margin-right: 15px"
+            class="btn btn-info" data-dismiss="modal" [disabled]="!oneSelectedAsCategory()">
+            Kategorie für Fach {{fachListToDisplay[currentFachIndex].fachName}} festlegen
+          </button>
+        </ng-container>
+        <ng-container *ngIf="markMvpBool">
+          <button [disabled]="!oneSelectedAsMvp()" (click)="persistMvpAndSort()" style="margin-right: 15px"
+                  class="btn btn-info" data-dismiss="modal">
+            Markiere Gegenstand als Favorit
+          </button>
+        </ng-container>
       </div>
     </div>
   </div>
 </div>
+<!-- highlight keyboard_voice videocam fiber_manual_record  -->

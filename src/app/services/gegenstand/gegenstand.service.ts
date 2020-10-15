@@ -19,4 +19,8 @@ export class GegenstandService {
   delete(gegenstandList: Gegenstand[], fachName: String): Observable<any> {
     return this.http.put<any>(environment.apiUrl + '/gegenstand/delete/' + fachName, gegenstandList);
   }
+
+  markMvp(fachName: String, gegenstandName: String):Observable<boolean> {
+    return this.http.put<boolean>(environment.apiUrl + '/gegenstand/mvp/' + fachName + '/' + gegenstandName, []);
+  }
 }

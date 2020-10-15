@@ -30,25 +30,20 @@ export class AusleihenAbgabeComponent implements OnInit {
         // @ts-ignore
         this.ausleihenAbgebenList[i].datum = datumString + timeString;
       }
-
     });
-
   }
-
-  sortByFachName1(a: Fach, b: Fach) {
-    let aName = a.fachName.toString();
-    let bName = b.fachName.toString();
-    if (aName < bName) {
-      return -1;
-    } else if (aName > bName) {
-      return 1;
-    }
-    return 0;
-    }
 
   sortByStudentNameExecution() {
     this.ausleihenAbgebenList.sort(
       (a, b) => this.sortByStudentName(a.student, b.student));
+  }
+
+  sortByDateExectution() {
+    this.ausleihenAbgebenList.sort(((a, b) => this.sortByDate(a.ausleihenAbgebenId, b.ausleihenAbgebenId)))
+  }
+
+  sortByFachNameExecution() {
+    this.ausleihenAbgebenList.sort(((a, b) => this.sortByFachName(a.fachName, b.fachName)));
   }
 
   sortByStudentName(a: Student, b: Student) {
@@ -62,16 +57,26 @@ export class AusleihenAbgabeComponent implements OnInit {
     return 0;
   }
 
-  sortByDateExectution() {
-    this.ausleihenAbgebenList.sort(((a, b) => this.sortByDate(a.ausleihenAbgebenId, b.ausleihenAbgebenId)))
+  sortByFachName(a:String, b:String ) {
+    let aa = a.split(/(\d+)/);
+    let bb = b.split(/(\d+)/);
+
+    for(var x = 0; x < Math.max(aa.length, bb.length); x++) {
+      if(aa[x] != bb[x]) {
+        var cmp1 = (isNaN(parseInt(aa[x],10)))? aa[x] : parseInt(aa[x],10);
+        var cmp2 = (isNaN(parseInt(bb[x],10)))? bb[x] : parseInt(bb[x],10);
+        if(cmp1 == undefined || cmp2 == undefined)
+          return aa.length - bb.length;
+        else
+          return (cmp1 < cmp2) ? -1 : 1;
+      }
+    }
+    return 0;
   }
 
   sortByDate(a: number, b: number) {
-    return a - b;
+    return b - a;
   }
 
-  sortByFachNameExecution() {
-    this.ausleihenAbgebenList.sort(((a, b) => this.sortByFachName1(a.fach, b.fach)))
 
-  }
 }
