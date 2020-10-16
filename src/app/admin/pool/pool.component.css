@@ -2,3 +2,41 @@
   text-align: center;
   margin: 40px;
 }
+.material-icons {
+  vertical-align: middle;
+}
+
+.addOrDeleteOrEditDiv {
+  width: 45.3%;
+  margin-top: 0.7%;
+  margin-bottom: 1.4%;
+  margin-left: 2%;
+  margin-right: 2%;
+  padding: 0.4%;
+  text-align: center;
+  display: inline-block;
+  cursor: pointer;
+}
+.ausleihenAbgebenDiv{
+  width: 45%;
+  cursor: pointer;
+  display: inline-block;
+  margin-top: 0.7%;
+  margin-bottom: 1.4%;
+  margin-left: 2%;
+  margin-right: 2%;
+  padding: 0.5%;
+}
+
+.ausleihenAbgebenDiv:hover{
+  cursor: pointer;
+  background-color: white;
+}
+
+#addDiv:hover {
+  background-color: mediumspringgreen;
+}
+
+#deleteDiv:hover {
+  background-color: orangered;
+}

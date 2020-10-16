@@ -7,5 +7,5 @@ export class Gegenstand {
   menge: number;
   ausgeliehen: boolean;
   selected: boolean;
-  mvp: boolean;
+  mvp: boolean = false;
 }

@@ -1,8 +1,9 @@
 <div
   style="text-align: center; overflow: hidden; height:200px; width: 70%; margin-left: 18%; margin-right: 18%; margin-top: 2.3%; text-align: center; overflow: hidden">
-  <div *ngFor="let category of categoryList, let i = index" style=" float: left; margin: 2%;">
-    <div style=" margin-right: 2%;">
-      <div [attr.id]="'category ' + i" (click)="setCategory(i)" class="categoryDivs">{{category.categoryName}}</div>
+  <div *ngFor="let category of categoryList1, let i = index" style=" float: left; margin: 2%;">
+    <div style=" margin: 1.5%">
+      <div [ngClass]="{'toggleBackgroundColor' : category.selected}" [attr.id]="'category ' + category.categoryName"
+           (click)="setCategory(i)" class="categoryDivs">{{category.categoryName}}</div>
     </div>
   </div>
 </div>
@@ -235,8 +236,8 @@ width: 25%; height: 250px; background-color: #ebebeb;">
         <ng-container *ngIf="!ausleihenBool && !benutzerDatenBool">
           <div>
             <div *ngFor="let gegenstand of studentFachGegenstandList, let i = index">
-              <div class="hoverItIn" (click)="addSelectedGegenstandToAbgeben(i)"
-                   [ngClass]="{'selected2' : gegenstand.selected}">
+              <div style="margin: 1.5%;" class="hoverItIn" (click)="addSelectedGegenstandToAbgeben(i)"
+                   [ngClass]="{'selected' : gegenstand.selected, 'unseleceted':!gegenstand.selected}">
                 {{gegenstand.gegenstandName}}
               </div>
             </div>
@@ -245,9 +246,10 @@ width: 25%; height: 250px; background-color: #ebebeb;">
         <ng-container *ngIf="ausleihenBool && !benutzerDatenBool">
           <div
             *ngFor="let gegenstand of fachList[currentFachIndex]?.gegenstandList">
-            <div class="hoverItIn" (click)="addSelectedGegenstandToAusleihen(gegenstand)"
-                 [ngClass]="{'ausgeliehen' : !gegenstand.ausgeliehen,
-                  'abgegeben' : gegenstand.ausgeliehen, 'selected' : gegenstand.selected}">
+            <div style="margin: 1.5%;" (click)="addSelectedGegenstandToAusleihen(gegenstand)"
+                 [ngClass]="{'ausgeliehen' : !gegenstand.ausgeliehen, 'abgegeben' : gegenstand.ausgeliehen,
+                  'selected' : gegenstand.selected, 'unseleceted':!gegenstand.selected,
+                  'hoverItIn': !gegenstand.ausgeliehen}">
               <span>{{gegenstand.gegenstandName}}</span>
             </div>
           </div>
@@ -291,10 +293,10 @@ width: 25%; height: 250px; background-color: #ebebeb;">
       </div>
       <div class="wrapper modal-body">
         <ng-container *ngIf="!markMvpBool">
-          <div *ngFor="let category of categoryList, let i = index">
-            <div class="hoverItIn" style="padding: 1%; cursor: pointer"
+          <div *ngFor="let category of categoryList2, let i = index">
+            <div class="hoverItIn" style="margin: 1.5%; cursor: pointer"
                  (click)="setSelectedCategory(i)"
-                 [ngClass]="{'categorySelected' : category.selected}">
+                 [ngClass]="{'selected' : category.selected, 'unselected': !category.selected}">
               {{category.categoryName}}
             </div>
           </div>
@@ -302,8 +304,8 @@ width: 25%; height: 250px; background-color: #ebebeb;">
         <ng-container *ngIf="markMvpBool">
           <div
             *ngFor="let gegenstand of fachListToDisplay[currentFachIndex].gegenstandList, let i = index">
-            <div class="hoverItIn" (click)="setSelectedGegenstandToMvp(i)" style="padding: 1%; cursor: pointer"
-                 [ngClass]="{'categorySelected' : gegenstand.mvp}">
+            <div style="margin: 1.5%; cursor: pointer;" class="hoverItIn" (click)="setSelectedGegenstandToMvp(i)"
+                 [ngClass]="{'selected' : gegenstand.mvp, 'unselected' : !gegenstand.mvp}">
               {{gegenstand.gegenstandName}}
             </div>
           </div>
@@ -313,8 +315,8 @@ width: 25%; height: 250px; background-color: #ebebeb;">
       <div class="modal-footer">
         <ng-container *ngIf="!markMvpBool && fachListToDisplay[currentFachIndex]">
           <button (click)="confirmCategoryForFach()"
-            style="margin-right: 15px"
-            class="btn btn-info" data-dismiss="modal" [disabled]="!oneSelectedAsCategory()">
+                  style="margin-right: 15px"
+                  class="btn btn-info" data-dismiss="modal" [disabled]="!oneSelectedAsCategory()">
             Kategorie für Fach {{fachListToDisplay[currentFachIndex].fachName}} festlegen
           </button>
         </ng-container>

@@ -21,6 +21,7 @@ export class OverviewComponent implements OnInit {
   addDialogBool: boolean;
   ausleihenBool: boolean;
   markMvpBool: boolean;
+  deleteBool: boolean;
   fachnummerNameAnzahlMapMap: Map<String, Map<String, number>>;
   gegenstandListToAdd: Gegenstand[] = [];
   initialGegenstandListToDelete: Gegenstand[] = [];
@@ -39,7 +40,8 @@ export class OverviewComponent implements OnInit {
   fachToAdd: Fach = new Fach();
   fachToDelete: Fach = new Fach();
   different: boolean = false;
-  categoryList: Category[] = [];
+  categoryList1: Category[] = [];
+  categoryList2: Category[] = [];
 
   constructor(private gegenstandService: GegenstandService,
               private fachService: FachService,
@@ -79,7 +81,6 @@ export class OverviewComponent implements OnInit {
         } else {
           nameAnzahlMap.set(" ", 0);
           this.fachnummerNameAnzahlMapMap.set(this.fachList[i].fachName, nameAnzahlMap);
-
         }
       }
       for (let i = 0; i < this.fachnummerNameAnzahlMapMap.size; i++) {
@@ -100,7 +101,6 @@ export class OverviewComponent implements OnInit {
         }
         if (map.has(" ")) {
           fach.leer = true;
-
         }
         this.fachListToDisplay.push(fach);
       }
@@ -109,15 +109,16 @@ export class OverviewComponent implements OnInit {
           const mengeFachListToDisplay: number = this.fachListToDisplay[i].gegenstandList[j].menge;
           const mengeAusgeliehenFachList: number = JSON.parse(
             JSON.stringify(this.fachList[i].gegenstandList)).filter(
-            gegenstand => gegenstand.gegenstandName === this.fachListToDisplay[i].gegenstandList[j].gegenstandName
-              && gegenstand.ausgeliehen).length;
+            gegenstand => gegenstand.gegenstandName ===
+              this.fachListToDisplay[i].gegenstandList[j].gegenstandName && gegenstand.ausgeliehen).length;
           this.fachListToDisplay[i].gegenstandList[j].ausgeliehen = mengeAusgeliehenFachList - mengeFachListToDisplay === 0;
         }
       }
 
       this.categoryService.retrieve().subscribe(categoryList => {
-          this.categoryList = categoryList;
+          this.categoryList1 = categoryList;
           for (let i = 0; i < this.fachListToDisplay.length; i++) {
+            this.fachListToDisplay[i].gegenstandList.sort(((a, b) => this.sortByGegenstandName(a, b)));
             if (this.fachList[i].category !== null) {
               this.fachListToDisplay[i].category = this.fachList[i].category;
               continue;
@@ -126,20 +127,32 @@ export class OverviewComponent implements OnInit {
             category.categoryName = " ";
             this.fachListToDisplay[i].category = category;
           }
+          this.categoryList2 = JSON.parse(JSON.stringify(this.categoryList1));
 
           let categoryState = localStorage.getItem("category");
-          for (let i = 0; i < this.categoryList.length; i++) {
-            let loopCurrentCategoryName = this.categoryList[i].categoryName;
-            let categoryDiv = $("#category " + loopCurrentCategoryName);
-            if (loopCurrentCategoryName.includes(categoryState)) {
-              categoryDiv.addClass("toggleBackgroundColor");
-              continue;
+          for (let i = 0; i < this.categoryList1.length; i++) {
+            let loopCurrentCategory = this.categoryList1[i];
+            if (loopCurrentCategory.categoryName === categoryState.toString()) {
+              loopCurrentCategory.selected = true;
             }
-            categoryDiv.removeClass("toggleBackgroundColor");
+          }
+          for (let i = 0; i < this.fachList.length; i++) {
+            for (let j = 0; j < this.fachList[i].gegenstandList.length; j++) {
+              if (this.fachList[i].gegenstandList[j].mvp) {
+                let gegenstand = this.fachListToDisplay[i].gegenstandList.find(
+                  gegenstand => gegenstand.gegenstandName === this.fachList[i].gegenstandList[j].gegenstandName);
+                gegenstand.mvp = true;
+              }
+            }
+          }
+          for (let i = 0; i < this.fachListToDisplay.length; i++) {
+            this.fachListToDisplay[i].gegenstandList.sort(((a, b) => this.sortForMvp(a, b)));
           }
           if (categoryState !== "Alle" && categoryState !== undefined) {
             this.fachListToDisplay = this.fachListToDisplay.filter(
               fach => fach.category.categoryName.includes(categoryState));
+            this.fachList = this.fachList.filter(
+              fach => fach.category?.categoryName.includes(categoryState));
           }
         }
       );
@@ -170,6 +183,7 @@ export class OverviewComponent implements OnInit {
   }
 
   openDeleteDialog(fachIndex: number) {
+    this.deleteBool = true;
     this.updateCurrentFachAndIndex(fachIndex);
     this.setGegenstandListsToDelete();
     this.addDialogBool = false;
@@ -293,19 +307,24 @@ export class OverviewComponent implements OnInit {
 
   disableBools() {
     this.fachList[this.currentFachIndex].gegenstandList.forEach(gegenstand => gegenstand.selected = false);
-    this.categoryList.forEach(category => category.selected = false);
+    this.categoryList1.forEach(category => category.selected = false);
+    this.categoryList2.forEach(category => category.selected = false);
     this.different = false;
     this.gegenstandListToAbgeben = [];
     this.weiterBool = false;
+    this.addDialogBool = false;
+    this.benutzerDatenBool = false;
     this.ausleihenBool = false;
     this.markMvpBool = false;
     this.resetGegenstandListToAdd();
+    if (this.deleteBool) {
+      this.router.navigate(['overview']);
+    }
   }
 
   getGegenstandListVonStudent() {
     this.studentService.get(this.student).subscribe(student => {
       this.student = student;
-      this.studentFachGegenstandList = JSON.parse(JSON.stringify(this.student.gegenstandList));
       this.studentFachGegenstandList = JSON.parse(JSON.stringify(this.studentFachGegenstandList)).filter(
         gegenstand1 => this.fachList[this.currentFachIndex].gegenstandList.map(
           gegenstand2 => gegenstand2.gegenstandId).includes(gegenstand1.gegenstandId));
@@ -415,22 +434,22 @@ export class OverviewComponent implements OnInit {
   }
 
   setCategory(index: number) {
-    let currentCategory = this.categoryList[index];
+    let currentCategory = this.categoryList1[index];
     localStorage.setItem("category", currentCategory.categoryName.toString());
     this.router.navigate(['overview']);
   }
 
   setSelectedCategory(i: number) {
-    for (let j = 0; j < this.categoryList.length; j++) {
-      this.categoryList[j].selected = false;
-      if (this.categoryList[j].categoryId === this.categoryList[i].categoryId) {
-        this.categoryList[i].selected = true;
+    for (let j = 0; j < this.categoryList2.length; j++) {
+      this.categoryList2[j].selected = false;
+      if (this.categoryList2[j].categoryId === this.categoryList1[i].categoryId) {
+        this.categoryList2[i].selected = true;
       }
     }
   }
 
   confirmCategoryForFach() {
-    let selectedCategory = this.categoryList.find(category => category.selected);
+    let selectedCategory = this.categoryList2.find(category => category.selected);
     this.categoryService.setFachsCategory(
       this.fachListToDisplay[this.currentFachIndex].fachName, selectedCategory.categoryId).subscribe(
       success => {
@@ -459,8 +478,8 @@ export class OverviewComponent implements OnInit {
   }
 
   oneSelectedAsCategory(): boolean {
-    for (let i = 0; i < this.categoryList.length; i++) {
-      if (this.categoryList[i].selected) {
+    for (let i = 0; i < this.categoryList2.length; i++) {
+      if (this.categoryList2[i].selected) {
         return true;
       }
     }
@@ -468,20 +487,31 @@ export class OverviewComponent implements OnInit {
   }
 
   persistMvpAndSort() {
-    //this.gegenstandService.markMvp().subscribe();
-    for (let i = 0; i < this.fachListToDisplay.length; i++) {
-      this.fachListToDisplay[i].gegenstandList.sort(((a, b) => this.sortForMvp(a, b)));
+    let toMvp;
+    for (let i = 0; i < this.fachListToDisplay[this.currentFachIndex].gegenstandList.length; i++) {
+      if (this.fachListToDisplay[this.currentFachIndex].gegenstandList[i].mvp) {
+        toMvp = this.fachListToDisplay[this.currentFachIndex].gegenstandList[i].gegenstandName;
+      }
     }
+    this.gegenstandService.markMvp(this.currentFachName, toMvp).subscribe(success => {
+      this.router.navigate(['overview']);
+    }, error => alert("fail"));
+  }
+
+  sortByGegenstandName(a: Gegenstand, b: Gegenstand) {
+    let aName = a.gegenstandName;
+    let bName = b.gegenstandName;
+    if (aName > bName) {
+      return 1;
+    }
+    if (aName < bName) {
+      return -1;
+    }
+    return 0;
   }
 
   sortForMvp(a: Gegenstand, b: Gegenstand) {
-    if (a.mvp) {
-      return -1;
-    }
-    if (!a.mvp) {
-      return 1;
-    }
-    return 0;
+    return Number(b.mvp) - Number(a.mvp);
   }
 }
 
