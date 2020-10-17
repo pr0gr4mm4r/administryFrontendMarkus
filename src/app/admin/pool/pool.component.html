@@ -13,12 +13,12 @@
       <h4 style="margin: 2%">Pool</h4>
     </div>
     <div id="addDiv" class="addOrDeleteOrEditDiv">
-      <div>
+      <div (click)="activateModalAddDelete(true)">
         <mat-icon>add_box</mat-icon>
       </div>
     </div>
     <div id="deleteDiv" class="addOrDeleteOrEditDiv">
-      <div>
+      <div (click)="activateModalAddDelete(false)">
         <mat-icon>delete</mat-icon>
       </div>
     </div>
@@ -31,63 +31,89 @@
       </div>
     </div>
     <div class="ausleihenAbgebenDiv">
-      <div >
+      <div>
         Rückgabe
       </div>
     </div>
   </div>
 </div>
 
-<!--
-<div style="text-align:center; border-color: black; border-style: solid; border-width: 2.5px;
-       margin-top:2%; margin-left: 2%; margin-right: 2%; width: 96%;">
-    <div style="margin:2%"><h4>Fach&nbsp;{{fach.fachName}}</h4></div>
-  </div>
+<div style="overflow: hidden; margin-bottom: 4.5%; margin-top: 3.3%">
+  <div style="margin-bottom: 3%;">
 
-  <ng-container *ngIf="fach.leer">
-    <div style="margin:2%" *ngFor="let gegenstand of fach.gegenstandList, let indexGegenstand = index">
-      <ng-container *ngIf="indexGegenstand === 0">
-        <div [ngClass]="{'ausgeliehen2' : gegenstand.ausgeliehen}"
-             style="font-size: 19px">{{gegenstand.gegenstandName}}&nbsp;&nbsp;
+  </div>
+</div>
+
+<div data-keyboard="false" data-backdrop="static" class="modal"
+     id="modal" tabindex="-1" role="dialog"
+     aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered modal-lg"
+       style="width: 530px" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h5 class="modal-title w-100" id="exampleModalLongTitle">
+          <span *ngIf="!addDialogBool">Gegenstände Permanent Löschen</span>
+          <span *ngIf="addDialogBool">Gegenstände dem Pool Hinzufügen</span>
+        </h5>
+        <button type="button" class="close" data-dismiss="modal" (click)="resetBools()" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="wrapper">
+        <ng-container *ngIf="addDialogBool">
+          <div style="text-align: center; overflow:hidden;"
+               *ngFor="let gegenstand of gegenstandListToAdd; let i = index">
+            <div style="display: inline-block; float: left; margin-left: 1%">
+              <mat-form-field [style.width.px]=340 ngDefaultControl>
+                <input matInput autocomplete="off" id="gegenstandName{{i}}"
+                       [(ngModel)]="gegenstand.gegenstandName"
+                       name="gegenstandName{{i}}" type="text" placeholder="Gegenstand {{i + 1}}">
+              </mat-form-field>
+            </div>
+            <div style="display: inline-block; float: right; margin-right: 1%;">
+              <mat-form-field [style.width.px]=50 ngDefaultControl>
+                <input matInput autocomplete="off" id="menge{{i}}" [(ngModel)]="gegenstand.menge"
+                       name="menge{{i}}" type="number" placeholder="Menge" min="1">
+              </mat-form-field>
+            </div>
+          </div>
+          <div>
+            <div style="display: inline-block; margin-right: 1.5%; cursor: pointer;"
+                 (click)="addDuringAddingProcess()">
+              <span class="material-icons">add_circle_outline</span>
+            </div>
+            <div style="display: inline-block; margin-left: 1.5%; cursor: pointer;"
+                 (click)="deleteDuringAddingProcess()">
+              <span class="material-icons">remove_circle_outline</span>
+            </div>
+          </div>
+        </ng-container>
+        <ng-container *ngIf="!addDialogBool">
+
+        </ng-container>
+        <div *ngFor="let gegenstand of pool.gegenstandList, let i = index">
+          <div style="text-align: center; overflow: hidden;">
+            <div style="display: inline-block; float: left; margin-left: 1%">
+              <mat-form-field [style.width.px]=370 ngDefaultControl>
+                <input readonly matInput id="gg{{i}}" [(ngModel)]="gegenstand.gegenstandName"
+                       name="gegenstadName{{i}}" type="text">
+              </mat-form-field>
+            </div>
+            <div style="display: inline-block; float: right; margin-right: 1%;">
+              <mat-form-field [style.width.px]=40 ngDefaultControl>
+                <input matInput id="mng{{i}}"
+                       [(ngModel)]="gegenstand.menge" name="meng{{i}}" type="number" placeholder="Menge" min="0">
+              </mat-form-field>
+            </div>
+          </div>
         </div>
-      </ng-container>
-      <ng-container *ngIf="indexGegenstand !== 0">
-        <div style="margin:2%" [ngClass]="{'ausgeliehen2' : gegenstand.ausgeliehen}">
-          {{gegenstand.gegenstandName}}
-        </div>
-      </ng-container>
-    </div>
-  </ng-container>
-  <ng-container *ngIf="!fach.leer">
-    <div *ngFor="let gegenstand of fach.gegenstandList, let indexGegenstand = index"
-         style="margin:2%">
-      <ng-container *ngIf="indexGegenstand === 0">
-        <div [ngClass]="{'ausgeliehen2' : gegenstand.ausgeliehen}"
-             style="font-size: 19px">{{gegenstand.gegenstandName}}&nbsp;&nbsp;
-          <span>({{gegenstand.menge}})</span>
-        </div>
-      </ng-container>
-      <ng-container *ngIf="indexGegenstand !== 0">
-        <div [ngClass]="{'ausgeliehen2' : gegenstand.ausgeliehen}">
-          {{gegenstand.gegenstandName}}&nbsp;&nbsp;<span>({{gegenstand.menge}}) </span>
-        </div>
-      </ng-container>
-    </div>
-  </ng-container>
-  <div class="ausleihenAbgebenDiv">
-    <div style="padding: 1%"
-         (click)="ausleihenOpen(fachIndex)">
-      Ausleihen
+      </div>
+      <div class="modal-footer">
+        <button [disabled]="checkIfGegenstandAddListIsFilled()"
+                style="margin-right: 15px" class="btn btn-info" (click)="addGegenstand()">
+          Gegenstände zum Pool Hinzufügen
+        </button>
+      </div>
     </div>
   </div>
-  <div class="ausleihenAbgebenDiv">
-    <div style="padding: 1%" (click)="openMarkMvpDialog(fachIndex)">
-      <span class="material-icons">stars</span>
-    </div>
-  </div>
-  <div class="ausleihenAbgebenDiv">
-    <div style="padding: 1%"
-         (click)="abgebenOpen(fachIndex)">
-      Rückgabe
-    </div>
-  </div>-->
+</div>

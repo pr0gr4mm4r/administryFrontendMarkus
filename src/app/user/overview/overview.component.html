@@ -3,7 +3,7 @@
   <div *ngFor="let category of categoryList1, let i = index" style=" float: left; margin: 2%;">
     <div style=" margin: 1.5%">
       <div [ngClass]="{'toggleBackgroundColor' : category.selected}" [attr.id]="'category ' + category.categoryName"
-           (click)="setCategory(i)" class="categoryDivs">{{category.categoryName}}</div>
+           (click)="setCategory(i)" class="categoryDivs">{{deletezzz(category.categoryName)}}</div>
     </div>
   </div>
 </div>
@@ -144,7 +144,7 @@ width: 25%; height: 250px; background-color: #ebebeb;">
               <div style="display: inline-block; float: right; margin-right: 7%;">
                 <mat-form-field [style.width.px]=50 ngDefaultControl>
                   <input matInput autocomplete="off" id="menge{{i}}" [(ngModel)]="gegenstand.menge"
-                         name="menge{{i}}" type="number" placeholder="Menge">
+                         name="menge{{i}}" type="number" placeholder="Menge" min="1">
                 </mat-form-field>
               </div>
             </div>
@@ -183,7 +183,7 @@ width: 25%; height: 250px; background-color: #ebebeb;">
       <div class="modal-footer">
         <button *ngIf="addDialogBool" [disabled]="checkIfGegenstandAddListIsFilled()"
                 style="margin-right: 15px" class="btn btn-info" (click)="addGegenstand()">
-          Gegenstände zu Fach {{fachListToDisplay[currentFachIndex].fachName}} hinzufügen
+          Gegenstände zu Fach {{fachListToDisplay[currentFachIndex].fachName}} Hinzufügen
         </button>
         <button *ngIf="!addDialogBool" [disabled]="!different"
                 style="margin-right: 15px" class="btn btn-info"
@@ -277,7 +277,6 @@ width: 25%; height: 250px; background-color: #ebebeb;">
     </div>
   </div>
 </div>
-
 <div data-keyboard="false" data-backdrop="static" class="modal" id="modal3" tabindex="-1" role="dialog"
      aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
   <div class="modal-dialog modal-dialog-centered" role="document">
@@ -297,7 +296,7 @@ width: 25%; height: 250px; background-color: #ebebeb;">
             <div class="hoverItIn" style="margin: 1.5%; cursor: pointer"
                  (click)="setSelectedCategory(i)"
                  [ngClass]="{'selected' : category.selected, 'unselected': !category.selected}">
-              {{category.categoryName}}
+              {{deletezzz(category.categoryName)}}
             </div>
           </div>
         </ng-container>
@@ -311,7 +310,6 @@ width: 25%; height: 250px; background-color: #ebebeb;">
           </div>
         </ng-container>
       </div>
-
       <div class="modal-footer">
         <ng-container *ngIf="!markMvpBool && fachListToDisplay[currentFachIndex]">
           <button (click)="confirmCategoryForFach()"
@@ -326,6 +324,34 @@ width: 25%; height: 250px; background-color: #ebebeb;">
             Markiere Gegenstand als Favorit
           </button>
         </ng-container>
+      </div>
+    </div>
+  </div>
+</div>
+<!--neue-->
+<div data-keyboard="false" data-backdrop="static" class="modal" id="modal4" tabindex="-1" role="dialog"
+     aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h5 class="modal-title w-100" id="exampleModalLongTitle4">
+          <span>Hinzufügen einer Kategorie</span>
+        </h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="wrapper modal-body">
+        <mat-form-field [style.width.px]=250 ngDefaultControl>
+          <input matInput autocomplete="off" id="categoryName" [(ngModel)]="categoryToAdd.categoryName"
+                 name="name" type="text" placeholder="Name der Kategorie">
+        </mat-form-field>
+      </div>
+      <div class="modal-footer">
+        <button style="margin-right: 15px" (click)="erstelleKategorie()"
+                class="btn btn-info" data-dismiss="modal">
+          Kategorie Hinzufügen
+        </button>
       </div>
     </div>
   </div>

@@ -19,4 +19,9 @@ export class CategoryService {
   setFachsCategory(fachName: String, categoryId: number): Observable<String> {
     return this.http.put<String>(environment.apiUrl + '/category/setFachsCategory/' + fachName + '/' + categoryId, []);
   }
+
+  createNewCategory(category: Category): Observable<String>{
+    return this.http.post<String>(environment.apiUrl + '/category/createNewCategory', category,
+      { responseType: "text" as 'json'})
+  }
 }

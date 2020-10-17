@@ -5,13 +5,17 @@ import {FormsModule} from "@angular/forms";
 import { AusleihenAbgabeComponent } from './ausleihen-abgabe/ausleihen-abgabe.component';
 import { StudentGegenstandComponent } from './student-gegenstand/student-gegenstand.component';
 import { PoolComponent } from './pool/pool.component';
+import {AppRoutingModule} from "../app-routing.module";
+import {UiModule} from "../ui/ui.module";
 
 
 
 @NgModule({
   declarations: [AusleihenAbgabeComponent, StudentGegenstandComponent, PoolComponent],
   imports: [
+    AppRoutingModule,
     CommonModule,
+    UiModule,
     SharedModule,
     FormsModule
   ],

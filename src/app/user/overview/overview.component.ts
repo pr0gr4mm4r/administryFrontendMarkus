@@ -1,4 +1,4 @@
-import {Component, OnInit} from '@angular/core';
+import {Component, OnDestroy, OnInit} from '@angular/core';
 import {GegenstandService} from "../../services/gegenstand/gegenstand.service";
 import {FachService} from "../../services/fach/fach.service";
 import {Fach} from "../../model/fach/fach";
@@ -42,6 +42,7 @@ export class OverviewComponent implements OnInit {
   different: boolean = false;
   categoryList1: Category[] = [];
   categoryList2: Category[] = [];
+  categoryToAdd: Category = new Category();
 
   constructor(private gegenstandService: GegenstandService,
               private fachService: FachService,
@@ -128,13 +129,24 @@ export class OverviewComponent implements OnInit {
             this.fachListToDisplay[i].category = category;
           }
           this.categoryList2 = JSON.parse(JSON.stringify(this.categoryList1));
+          this.categoryList2 = this.categoryList2.filter(
+            category => category.categoryName !== "Alle"
+              && category.categoryName !== "zzzNeue");
 
           let categoryState = localStorage.getItem("category");
+          console.log(categoryState);
+          if (categoryState === null) {
+            categoryState = "Alle";
+          }
           for (let i = 0; i < this.categoryList1.length; i++) {
             let loopCurrentCategory = this.categoryList1[i];
             if (loopCurrentCategory.categoryName === categoryState.toString()) {
               loopCurrentCategory.selected = true;
             }
+          }
+          if (categoryState === "zzzNeue") {
+            this.activateModal4();
+            localStorage.setItem("category", "Alle");
           }
           for (let i = 0; i < this.fachList.length; i++) {
             for (let j = 0; j < this.fachList[i].gegenstandList.length; j++) {
@@ -148,12 +160,13 @@ export class OverviewComponent implements OnInit {
           for (let i = 0; i < this.fachListToDisplay.length; i++) {
             this.fachListToDisplay[i].gegenstandList.sort(((a, b) => this.sortForMvp(a, b)));
           }
-          if (categoryState !== "Alle" && categoryState !== undefined) {
+          if (categoryState !== "Alle") {
             this.fachListToDisplay = this.fachListToDisplay.filter(
               fach => fach.category.categoryName.includes(categoryState));
             this.fachList = this.fachList.filter(
               fach => fach.category?.categoryName.includes(categoryState));
           }
+          this.categoryList1 = this.categoryList1.sort((a, b) => this.sortCategoryList1(a, b));
         }
       );
     });
@@ -169,6 +182,10 @@ export class OverviewComponent implements OnInit {
 
   activateModal3() {
     $('#modal3').modal();
+  }
+
+  activateModal4() {
+    $('#modal4').modal();
   }
 
   openAddDialog(fachIndex: number) {
@@ -252,6 +269,7 @@ export class OverviewComponent implements OnInit {
   prepareRouter() {
     $('#modal').modal("hide");
     $('#modal2').modal("hide");
+    $('modal3').modal("hide");
     this.router.routeReuseStrategy.shouldReuseRoute = () => false
     this.router.onSameUrlNavigation = 'reload';
   }
@@ -389,7 +407,7 @@ export class OverviewComponent implements OnInit {
 
   checkIfGegenstandAddListIsFilled(): boolean {
     for (let i = 0; i < this.gegenstandListToAdd.length; i++) {
-      if (!this.gegenstandListToAdd[i].gegenstandName) {
+      if (!this.gegenstandListToAdd[i].gegenstandName || this.gegenstandListToAdd[i].menge < 1) {
         return true;
       }
     }
@@ -442,7 +460,7 @@ export class OverviewComponent implements OnInit {
   setSelectedCategory(i: number) {
     for (let j = 0; j < this.categoryList2.length; j++) {
       this.categoryList2[j].selected = false;
-      if (this.categoryList2[j].categoryId === this.categoryList1[i].categoryId) {
+      if (this.categoryList2[j].categoryId === this.categoryList2[i].categoryId) {
         this.categoryList2[i].selected = true;
       }
     }
@@ -512,6 +530,35 @@ export class OverviewComponent implements OnInit {
 
   sortForMvp(a: Gegenstand, b: Gegenstand) {
     return Number(b.mvp) - Number(a.mvp);
+  }
+
+  erstelleKategorie() {
+    /*if (this.categoryList2.map(category => category.categoryName).includes(this.categoryToAdd.categoryName.toString())){
+      alert("fail");
+      return;
+    }*/
+    this.categoryService.createNewCategory(this.categoryToAdd).subscribe(success => {
+      this.router.navigate(['overview']);
+    });
+  }
+
+  sortCategoryList1(a: Category, b: Category) {
+    let aName = a.categoryName;
+    let bName = b.categoryName;
+    if (aName < bName) {
+      return -1;
+    }
+    if (aName > bName) {
+      return 1;
+    }
+    return 0;
+  }
+
+  deletezzz(categoryName: String) {
+    if (categoryName === "zzzNeue") {
+      return "Neue";
+    }
+    return categoryName;
   }
 }
 

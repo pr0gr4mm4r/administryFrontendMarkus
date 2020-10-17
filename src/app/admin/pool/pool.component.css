@@ -5,6 +5,9 @@
 .material-icons {
   vertical-align: middle;
 }
+.wrapper {
+  text-align: center;
+}
 
 .addOrDeleteOrEditDiv {
   width: 45.3%;
