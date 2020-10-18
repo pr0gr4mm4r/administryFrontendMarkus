@@ -28,6 +28,18 @@
   cursor: pointer;
 }
 
+.ausgeliehen {
+  background-color: mediumspringgreen;
+}
+
+.abgegeben {
+  background-color: orangered;
+}
+
+.ausgeliehen2 {
+  color: red;
+}
+
 .addOrDeleteOrEditDiv {
   width: 45.3%;
   margin-top: 0.7%;

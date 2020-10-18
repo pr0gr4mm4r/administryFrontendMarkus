@@ -1,8 +1,9 @@
+{{gegenstandListToDelete|json}}
 <div class="wrapper">
   <div>
     <mat-form-field [style.width.px]=500>
       <input matInput autocomplete="off" (input)="filterPool()"
-             id="search" [(ngModel)]="suche"
+             id="suche" [(ngModel)]="suche"
              name="search" type="text" placeholder="Suche Gegenstand">
     </mat-form-field>
   </div>
@@ -23,34 +24,30 @@
       </div>
     </div>
     <ng-container *ngIf="suche">
-      <div style="margin: 2%" *ngFor="let option of filteredOptions | async">
-        {{option}}
+      <div style="margin: 2%" *ngFor="let gegenstand of pool.gegenstandList"
+           [ngClass]="{'ausgeliehen2' : gegenstand.ausgeliehen}">
+        {{gegenstand.gegenstandName}}
       </div>
     </ng-container>
     <ng-container *ngIf="!suche">
-      <div style="margin: 2%" *ngFor="let gegenstand of startingGegenstandList">
+      <div style="margin: 2%" *ngFor="let gegenstand of pool.gegenstandList"
+           [ngClass]="{'ausgeliehen2' : gegenstand.ausgeliehen}">
         {{gegenstand.gegenstandName}}
       </div>
     </ng-container>
     <div class="ausleihenAbgebenDiv">
-      <div>
+      <div (click)="activateModalAusleihenAbgeben(true)">
         Ausleihen
       </div>
     </div>
     <div class="ausleihenAbgebenDiv">
-      <div>
+      <div (click)="activateModalAusleihenAbgeben(false)">
         Rückgabe
       </div>
     </div>
   </div>
 </div>
-
-<div style="overflow: hidden; margin-bottom: 4.5%; margin-top: 3.3%">
-  <div style="margin-bottom: 3%;">
-
-  </div>
-</div>
-
+<!--ADD DELETE-->
 <div data-keyboard="false" data-backdrop="static" class="modal"
      id="modal" tabindex="-1" role="dialog"
      aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
@@ -117,6 +114,73 @@
           <button [disabled]="checkIfGegenstandDeleteListIsFilled()"
                   style="margin-right: 15px" class="btn btn-info" (click)="deleteGegenstandList()">
             Gegenstände Permenent Löschen
+          </button>
+        </ng-container>
+      </div>
+    </div>
+  </div>
+</div>
+<!--AUSLEIHEN/ ABGEBEN-->
+<div data-keyboard="false" data-backdrop="static" class="modal"
+     id="modal2" tabindex="-1" role="dialog"
+     aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered modal-lg"
+       style="width: 450px" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h5 class="modal-title w-100" id="exampleModalLongTitle2">
+          <span *ngIf="ausleihenBool">Gegenstände Ausleihen</span>
+          <span *ngIf="!ausleihenBool">Gegenstände Abgeben</span>
+        </h5>
+        <button type="button" class="close" data-dismiss="modal" (click)="resetBools()" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="wrapper">
+
+        <ng-container *ngIf="!weiterBool">
+          <div>
+            <mat-form-field [style.width.px]=250 ngDefaultControl>
+              <input matInput autocomplete="off" id="studentName2" [(ngModel)]="student.studentName"
+                     name="name" type="text" placeholder="Name des Studierenden">
+            </mat-form-field>
+            <mat-form-field [style.width.px]=255 ngDefaultControl>
+              <input matInput autocomplete="off" id="studentTelefon2" [(ngModel)]="student.handyNummer"
+                     name="name" type="text" placeholder="Telefonnummer des Studierenden">
+            </mat-form-field>
+          </div>
+        </ng-container>
+        <ng-container *ngIf="ausleihenBool && weiterBool">
+          <div *ngFor="let gegenstand of gegenstandListToAusleihen, let i = index">
+            <div (click)="setSelectedAusleihenList(i)" class="deleteDivs" style="margin: 0.5%"
+                 [ngClass]="{'selected' : gegenstand.selected, 'unselected': !gegenstand.selected,
+                 'ausgeliehen' : !gegenstand.ausgeliehen, 'abgegeben': gegenstand.ausgeliehen}">
+              {{gegenstand.gegenstandName}}
+            </div>
+          </div>
+        </ng-container>
+        <ng-container *ngIf="!ausleihenBool && weiterBool">
+          <div *ngFor="let gegenstand of studentFachGegenstandList">
+            {{gegenstand.gegenstandName}}
+          </div>
+        </ng-container>
+      </div>
+      <div class="modal-footer">
+        <button [disabled]="!student.studentName || !student.handyNummer"
+                *ngIf="benutzerDatenBool" style="margin-right: 15px"
+                class="btn btn-info" (click)="this.legeBenutzerAn()">
+          Weiter
+        </button>
+        <ng-container *ngIf="ausleihenBool && weiterBool">
+          <button [disabled]="gegenstandListToAusleihenReady()"
+                  style="margin-right: 15px" class="btn btn-info" (click)="ausleihen()">
+            Gegenstände Ausleihen
+          </button>
+        </ng-container>
+        <ng-container *ngIf="!ausleihenBool && weiterBool">
+          <button [disabled]="gegenstandListToAbgebenReady()"
+                  style="margin-right: 15px" class="btn btn-info" (click)="abgeben()">
+            Gegenstände Abgeben
           </button>
         </ng-container>
       </div>

@@ -343,7 +343,7 @@ export class OverviewComponent implements OnInit {
   getGegenstandListVonStudent() {
     this.studentService.get(this.student).subscribe(student => {
       this.student = student;
-      this.studentFachGegenstandList = JSON.parse(JSON.stringify(this.studentFachGegenstandList)).filter(
+      this.studentFachGegenstandList = JSON.parse(JSON.stringify(this.student.gegenstandList)).filter(
         gegenstand1 => this.fachList[this.currentFachIndex].gegenstandList.map(
           gegenstand2 => gegenstand2.gegenstandId).includes(gegenstand1.gegenstandId));
     });
@@ -384,11 +384,11 @@ export class OverviewComponent implements OnInit {
 
   fachErstellen() {
     if (this.fachToAdd.fachName) {
-      let category = localStorage.getItem("category");
-      if (category === null || category === "Neue") {
-        category = "Alle";
+      let categoryName = localStorage.getItem("category");
+      if (categoryName === null || categoryName === "Neue") {
+        categoryName = "Alle";
       }
-      this.fachService.add(this.fachToAdd, category).subscribe(success => {
+      this.fachService.add(this.fachToAdd, categoryName).subscribe(success => {
         this.router.navigate(['overview']);
       }, error => alert("Fachname schon vergeben oder anderer Fehler!"));
     }

@@ -1,12 +1,12 @@
 import {Component, OnInit} from '@angular/core';
 import {FachService} from "../../services/fach/fach.service";
 import {Fach} from "../../model/fach/fach";
-import {Observable} from "rxjs";
-import {FormControl} from "@angular/forms";
-import {map, startWith} from "rxjs/operators";
 import {GegenstandService} from "../../services/gegenstand/gegenstand.service";
 import {Gegenstand} from "../../model/gegenstand/gegenstand";
 import {Router} from "@angular/router";
+import {Student} from "../../model/student/student";
+import {StudentService} from "../../services/student/student.service";
+import {AusleihenAbgebenService} from "../../services/ausleihenAbgeben/ausleihen-abgeben.service";
 
 declare var $;
 
@@ -19,16 +19,22 @@ export class PoolComponent implements OnInit {
 
   pool: Fach = new Fach();
   suche: String = "";
-  aktuelleGegenstandStringList: string[] = [];
-  filteredOptions: Observable<string[]>;
-  myControl = new FormControl();
   gegenstandListToAdd: Gegenstand[] = [];
   addDialogBool: boolean;
+  ausleihenBool: boolean;
+  benutzerDatenBool: boolean;
+  weiterBool: boolean;
   startingGegenstandList: Gegenstand[] = [];
   gegenstandListToDelete: Gegenstand[] = [];
+  gegenstandListToAusleihen: Gegenstand[] = [];
+  gegenstandListToAbgeben: Gegenstand[] = [];
+  student: Student = new Student();
+  studentFachGegenstandList: Gegenstand[] = [];
 
   constructor(private fachService: FachService,
               private gegenstandService: GegenstandService,
+              private studentService: StudentService,
+              private auleihenAbgebenService: AusleihenAbgebenService,
               private router: Router) {
   }
 
@@ -43,30 +49,14 @@ export class PoolComponent implements OnInit {
           let gegenstandName = this.pool.gegenstandList[i].gegenstandName.toString();
           let gegenstand = new Gegenstand();
           gegenstand.gegenstandName = gegenstandName;
+          gegenstand.ausgeliehen = this.pool.gegenstandList[i].ausgeliehen;
           this.startingGegenstandList.push(gegenstand);
-          this.aktuelleGegenstandStringList.push(gegenstandName);
         }
-      this.startingGegenstandList = this.startingGegenstandList.sort(
-        (a, b) => this.sortGegenstandList(a.gegenstandName, b.gegenstandName));
-      this.fillFilteredOptionsStart();
+        this.sortPool();
       }
     );
   }
 
-  fillFilteredOptionsStart() {
-    this.filteredOptions = this.myControl.valueChanges.pipe(
-      startWith(''),
-      map(() => this.aktuelleGegenstandStringList));
-  }
-
-  fillFilteredOptionsKeinStart() {
-    this.filteredOptions = this.myControl.valueChanges.pipe(
-      startWith(''),
-      map(() => this.aktuelleGegenstandStringList.filter(
-        gegenstand => gegenstand.includes(this.suche.toString())).sort(
-        ((a, b) => this.sortGegenstandList(a, b))
-      )));
-  }
 
   addGegenstandList() {
     this.gegenstandService.add(
@@ -92,6 +82,8 @@ export class PoolComponent implements OnInit {
 
   resetBools() {
     this.addDialogBool = false;
+    this.benutzerDatenBool = false;
+    this.weiterBool = false;
   }
 
   activateModalAddDelete(addOrDelete: boolean) {
@@ -104,17 +96,7 @@ export class PoolComponent implements OnInit {
   }
 
   setDeleteList() {
-    if (this.suche) {
-      this.gegenstandListToDelete = this.pool.gegenstandList.filter(
-        gegenstand => gegenstand.gegenstandName.includes(this.suche.toString()));
-      this.gegenstandListToDelete = this.gegenstandListToDelete.sort(
-        ((a, b) => this.sortGegenstandList(a.gegenstandName, b.gegenstandName))
-      );
-    } else {
-      this.gegenstandListToDelete = this.pool.gegenstandList.sort(
-        ((a, b) => this.sortGegenstandList(a.gegenstandName, b.gegenstandName))
-      );
-    }
+    this.gegenstandListToDelete = JSON.parse(JSON.stringify(this.pool.gegenstandList));
   }
 
   checkIfGegenstandAddListIsFilled(): boolean {
@@ -128,8 +110,14 @@ export class PoolComponent implements OnInit {
 
 
   filterPool() {
-    this.pool.gegenstandList.filter(gegenstand => gegenstand.gegenstandName);
-    this.fillFilteredOptionsKeinStart();
+    if (!this.suche) {
+      this.pool.gegenstandList = JSON.parse(JSON.stringify(this.startingGegenstandList));
+    }
+    if (this.suche) {
+      this.pool.gegenstandList = JSON.parse(JSON.stringify(this.startingGegenstandList)).filter(
+        gegenstand => gegenstand.gegenstandName.includes($("#suche").val()));
+    }
+    this.sortPool();
   }
 
   prepareRouter() {
@@ -139,7 +127,6 @@ export class PoolComponent implements OnInit {
   }
 
   setSelectedGegenstandOfPool(i: number) {
-    this.setDeleteList();
     this.gegenstandListToDelete[i].selected = !this.gegenstandListToDelete[i].selected;
   }
 
@@ -153,7 +140,8 @@ export class PoolComponent implements OnInit {
   }
 
   deleteGegenstandList() {
-    let finalDeleteList = this.gegenstandListToDelete.filter(gegenstand => gegenstand.selected);
+    let finalDeleteList = this.gegenstandListToDelete.filter(
+      gegenstand => !gegenstand.ausgeliehen && gegenstand.selected);
     this.gegenstandService.deleteFromPool(finalDeleteList).subscribe(
       success => this.router.navigate(['pool']), error => alert("fail"));
   }
@@ -173,5 +161,116 @@ export class PoolComponent implements OnInit {
       }
     }
     return 0;
+  }
+
+  sortPool() {
+    this.pool.gegenstandList = this.pool.gegenstandList.sort(
+      ((a, b) => this.sortGegenstandList(a.gegenstandName, b.gegenstandName)));
+  }
+
+  ausleihen() {
+    this.auleihenAbgebenService.ausleihen(
+      this.student.studentName, this.student.handyNummer,
+     this.gegenstandListToAusleihen.filter(
+        gegenstand => gegenstand.selected).map(
+        gegenstand => gegenstand.gegenstandId)
+    ).subscribe(
+      () => {
+        this.router.navigate(['overview']);
+      }, error => alert("Ausleihvorgang NICHT abgeschlossen!"));
+  }
+
+  abgeben() {
+    this.auleihenAbgebenService.abgeben(
+      this.student.studentName, this.student.handyNummer,
+      Array.from(new Set(this.gegenstandListToAbgeben)).map(gegenstand => gegenstand.gegenstandId)).subscribe(
+      message => {
+        this.router.navigate(['overview']);
+      }, error => {
+        alert("Abgabevorgang NICHT abgeschlossen!");
+      });
+  }
+
+  activateModalAusleihenAbgeben(ausleihBool: boolean) {
+    if (ausleihBool) {
+      this.ausleihenBool = true;
+    }
+    if (!ausleihBool) {
+      this.ausleihenBool = false;
+    }
+    this.setAusleihenList();
+    this.setAbgebenList();
+    this.benutzerDatenBool = true;
+    $('#modal2').modal();
+  }
+
+  setAusleihenList() {
+    this.sortPool();
+    if (this.suche) {
+      this.gegenstandListToAusleihen = this.pool.gegenstandList.filter(
+        gegenstand => gegenstand.gegenstandName.includes(this.suche.toString()));
+    } else {
+      this.gegenstandListToAusleihen = this.pool.gegenstandList;
+    }
+  }
+
+  setAbgebenList() {
+    if (this.suche) {
+      this.gegenstandListToAbgeben = this.pool.gegenstandList.filter(
+        gegenstand => gegenstand.gegenstandName.includes(this.suche.toString()));
+      this.gegenstandListToAbgeben = this.gegenstandListToAbgeben.sort(
+        ((a, b) => this.sortGegenstandList(a.gegenstandName, b.gegenstandName))
+      );
+    } else {
+      this.gegenstandListToAbgeben = this.pool.gegenstandList.sort(
+        ((a, b) => this.sortGegenstandList(a.gegenstandName, b.gegenstandName))
+      );
+    }
+  }
+
+  setSelectedAusleihenList(i: number) {
+    this.gegenstandListToAusleihen[i].selected = !this.gegenstandListToAusleihen[i].selected;
+  }
+
+  legeBenutzerAn() {
+    this.studentService.add(this.student).subscribe(
+      success => {
+        this.getGegenstandListVonStudent();
+      }, error => {
+        alert("fail");
+      }
+    );
+    this.weiterBool = true;
+    this.benutzerDatenBool = false;
+  }
+
+  getGegenstandListVonStudent() {
+    this.studentService.get(this.student).subscribe(student => {
+      this.student = student;
+      this.studentFachGegenstandList = this.student.gegenstandList.filter(
+        gegenstand => this.studentFachGegenstandList.map(
+          gegenstand2 => gegenstand2.gegenstandId).includes(gegenstand.gegenstandId));
+      this.studentFachGegenstandList = this.studentFachGegenstandList.sort(
+        ((a, b) => this.sortGegenstandList(a.gegenstandName, b.gegenstandName))
+      )
+    });
+  }
+
+  gegenstandListToAusleihenReady() {
+    for (let i = 0; i < this.gegenstandListToAusleihen.length; i++) {
+      if (this.gegenstandListToAusleihen[i].selected) {
+        return false;
+      }
+    }
+    return true;
+  }
+
+  gegenstandListToAbgebenReady() {
+    for (let i = 0; i < this.gegenstandListToAbgeben.length; i++) {
+      if (this.gegenstandListToAbgeben[i].selected) {
+        return false;
+      }
+    }
+    return true;
   }
 }

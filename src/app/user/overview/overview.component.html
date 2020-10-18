@@ -1,5 +1,4 @@
-<div
-  style="text-align: center; overflow: hidden; height:200px; width: 70%; margin-left: 18%; margin-right: 18%; margin-top: 2.3%; text-align: center; overflow: hidden">
+<div style="text-align: center; overflow: hidden; height:200px; width: 70%; margin-left: 18%; margin-right: 18%; margin-top: 2.3%; text-align: center; overflow: hidden">
   <div *ngFor="let category of categoryList1, let i = index" style=" float: left; margin: 2%;">
     <div style=" margin: 1.5%">
       <div [ngClass]="{'toggleBackgroundColor' : category.selected}" [attr.id]="'category ' + category.categoryName"
