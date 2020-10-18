@@ -1,4 +1,4 @@
-import {Component, OnDestroy, OnInit} from '@angular/core';
+import {Component, OnInit} from '@angular/core';
 import {GegenstandService} from "../../services/gegenstand/gegenstand.service";
 import {FachService} from "../../services/fach/fach.service";
 import {Fach} from "../../model/fach/fach";
