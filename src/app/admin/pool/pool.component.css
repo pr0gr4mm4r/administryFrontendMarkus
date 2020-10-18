@@ -9,6 +9,25 @@
   text-align: center;
 }
 
+.selected {
+  border: 3px solid #1C1C1C !important;
+}
+.unselected{
+  border: 3px solid white !important;
+}
+
+.deleteDivs:hover{
+  background-color: #1C1C1C;
+  color: white;
+  cursor: pointer;
+}
+
+.deleteDivs{
+  background-color: white;
+  color: #1C1C1C;
+  cursor: pointer;
+}
+
 .addOrDeleteOrEditDiv {
   width: 45.3%;
   margin-top: 0.7%;

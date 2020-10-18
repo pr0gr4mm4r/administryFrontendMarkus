@@ -296,7 +296,7 @@ width: 25%; height: 250px; background-color: #ebebeb;">
             <div class="hoverItIn" style="margin: 1.5%; cursor: pointer"
                  (click)="setSelectedCategory(i)"
                  [ngClass]="{'selected' : category.selected, 'unselected': !category.selected}">
-              {{deletezzz(category.categoryName)}}
+              {{category.categoryName}}
             </div>
           </div>
         </ng-container>

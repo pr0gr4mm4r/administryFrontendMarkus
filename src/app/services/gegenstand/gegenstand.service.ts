@@ -20,6 +20,10 @@ export class GegenstandService {
     return this.http.put<any>(environment.apiUrl + '/gegenstand/delete/' + fachName, gegenstandList);
   }
 
+  deleteFromPool(gegenstandList: Gegenstand[]): Observable<any> {
+    return this.http.put<any>(environment.apiUrl + '/gegenstand/deleteFromPool', gegenstandList);
+  }
+
   markMvp(fachName: String, gegenstandName: String):Observable<boolean> {
     return this.http.put<boolean>(environment.apiUrl + '/gegenstand/mvp/' + fachName + '/' + gegenstandName, []);
   }

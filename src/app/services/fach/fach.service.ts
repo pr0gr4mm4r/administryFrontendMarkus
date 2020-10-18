@@ -11,8 +11,8 @@ export class FachService {
 
   constructor(private http: HttpClient) { }
 
-  add(fach: Fach): Observable<Fach> {
-    return this.http.put<Fach>(environment.apiUrl + '/fach/add/', fach);
+  add(fach: Fach, categoryName: String): Observable<Fach> {
+    return this.http.post<Fach>(environment.apiUrl + '/fach/add/' + categoryName, fach);
   }
 
   retrieve(): Observable<[Fach]> {

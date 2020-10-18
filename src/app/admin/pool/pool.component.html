@@ -22,9 +22,16 @@
         <mat-icon>delete</mat-icon>
       </div>
     </div>
-    <div style="margin: 2%" *ngFor="let option of filteredOptions | async">
-      {{option}}
-    </div>
+    <ng-container *ngIf="suche">
+      <div style="margin: 2%" *ngFor="let option of filteredOptions | async">
+        {{option}}
+      </div>
+    </ng-container>
+    <ng-container *ngIf="!suche">
+      <div style="margin: 2%" *ngFor="let gegenstand of startingGegenstandList">
+        {{gegenstand.gegenstandName}}
+      </div>
+    </ng-container>
     <div class="ausleihenAbgebenDiv">
       <div>
         Ausleihen
@@ -89,30 +96,29 @@
           </div>
         </ng-container>
         <ng-container *ngIf="!addDialogBool">
-
-        </ng-container>
-        <div *ngFor="let gegenstand of pool.gegenstandList, let i = index">
-          <div style="text-align: center; overflow: hidden;">
-            <div style="display: inline-block; float: left; margin-left: 1%">
-              <mat-form-field [style.width.px]=370 ngDefaultControl>
-                <input readonly matInput id="gg{{i}}" [(ngModel)]="gegenstand.gegenstandName"
-                       name="gegenstadName{{i}}" type="text">
-              </mat-form-field>
-            </div>
-            <div style="display: inline-block; float: right; margin-right: 1%;">
-              <mat-form-field [style.width.px]=40 ngDefaultControl>
-                <input matInput id="mng{{i}}"
-                       [(ngModel)]="gegenstand.menge" name="meng{{i}}" type="number" placeholder="Menge" min="0">
-              </mat-form-field>
+          <div *ngFor="let gegenstand of gegenstandListToDelete, let i = index">
+            <div style="text-align: center;">
+              <div (click)="setSelectedGegenstandOfPool(i)" style="margin: 0.5%" class="deleteDivs"
+                   [ngClass]="{'selected' : gegenstand.selected, 'unselected': !gegenstand.selected}">
+                {{gegenstand.gegenstandName}}
+              </div>
             </div>
           </div>
-        </div>
+        </ng-container>
       </div>
       <div class="modal-footer">
-        <button [disabled]="checkIfGegenstandAddListIsFilled()"
-                style="margin-right: 15px" class="btn btn-info" (click)="addGegenstand()">
-          Gegenstände zum Pool Hinzufügen
-        </button>
+        <ng-container *ngIf="addDialogBool">
+          <button [disabled]="checkIfGegenstandAddListIsFilled()"
+                  style="margin-right: 15px" class="btn btn-info" (click)="addGegenstandList()">
+            Gegenstände zum Pool Hinzufügen
+          </button>
+        </ng-container>
+        <ng-container *ngIf="!addDialogBool">
+          <button [disabled]="checkIfGegenstandDeleteListIsFilled()"
+                  style="margin-right: 15px" class="btn btn-info" (click)="deleteGegenstandList()">
+            Gegenstände Permenent Löschen
+          </button>
+        </ng-container>
       </div>
     </div>
   </div>

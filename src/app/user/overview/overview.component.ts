@@ -128,13 +128,13 @@ export class OverviewComponent implements OnInit {
             category.categoryName = " ";
             this.fachListToDisplay[i].category = category;
           }
+          this.fachListToDisplay.sort(((a, b) => this.sortByFachName(a.fachName, b.fachName)));
           this.categoryList2 = JSON.parse(JSON.stringify(this.categoryList1));
           this.categoryList2 = this.categoryList2.filter(
             category => category.categoryName !== "Alle"
               && category.categoryName !== "zzzNeue");
 
           let categoryState = localStorage.getItem("category");
-          console.log(categoryState);
           if (categoryState === null) {
             categoryState = "Alle";
           }
@@ -384,12 +384,13 @@ export class OverviewComponent implements OnInit {
 
   fachErstellen() {
     if (this.fachToAdd.fachName) {
-      this.fachService.add(this.fachToAdd).subscribe(success => {
-          this.router.navigate(['/']);
-        }, error => {
-          alert("Fachname schon vergeben oder anderer Fehler!");
-        }
-      );
+      let category = localStorage.getItem("category");
+      if (category === null || category === "Neue") {
+        category = "Alle";
+      }
+      this.fachService.add(this.fachToAdd, category).subscribe(success => {
+        this.router.navigate(['overview']);
+      }, error => alert("Fachname schon vergeben oder anderer Fehler!"));
     }
   }
 
@@ -533,13 +534,9 @@ export class OverviewComponent implements OnInit {
   }
 
   erstelleKategorie() {
-    /*if (this.categoryList2.map(category => category.categoryName).includes(this.categoryToAdd.categoryName.toString())){
-      alert("fail");
-      return;
-    }*/
     this.categoryService.createNewCategory(this.categoryToAdd).subscribe(success => {
       this.router.navigate(['overview']);
-    });
+    }, error => alert("schon vorhanden oder anderer Fehler"));
   }
 
   sortCategoryList1(a: Category, b: Category) {
@@ -550,6 +547,23 @@ export class OverviewComponent implements OnInit {
     }
     if (aName > bName) {
       return 1;
+    }
+    return 0;
+  }
+
+  sortByFachName(a: String, b: String) {
+    let aa = a.split(/(\d+)/);
+    let bb = b.split(/(\d+)/);
+
+    for (var x = 0; x < Math.max(aa.length, bb.length); x++) {
+      if (aa[x] != bb[x]) {
+        var cmp1 = (isNaN(parseInt(aa[x], 10))) ? aa[x] : parseInt(aa[x], 10);
+        var cmp2 = (isNaN(parseInt(bb[x], 10))) ? bb[x] : parseInt(bb[x], 10);
+        if (cmp1 == undefined || cmp2 == undefined)
+          return aa.length - bb.length;
+        else
+          return (cmp1 < cmp2) ? -1 : 1;
+      }
     }
     return 0;
   }
