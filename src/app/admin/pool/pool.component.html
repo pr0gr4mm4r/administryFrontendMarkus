@@ -154,7 +154,7 @@
             <div (click)="setSelectedAusleihenList(i)" style="margin: 0.5%"
                  [ngClass]="{'unselected': !gegenstand.selected,
                  'ausgeliehen' : !gegenstand.ausgeliehen, 'abgegeben': gegenstand.ausgeliehen,
-                 'hoverItIn': !gegenstand.ausgeliehen, 'importantWhite': gegenstand.selected}">
+                 'hoverItIn': !gegenstand.ausgeliehen, 'importantGreen': gegenstand.selected}">
               {{gegenstand.gegenstandName}}
             </div>
           </div>
@@ -162,8 +162,8 @@
         <ng-container *ngIf="!ausleihenBool && weiterBool">
           <div *ngFor="let gegenstand of gegenstandListToAbgeben, let i = index"
                (click)="setSelectedGegenstandToAbgeben(i)"
-               class="hoverItIn" style="margin: 0.5%;"
-               [ngClass]="{'unselected': !gegenstand.selected, 'importantWhite': gegenstand.selected}">
+               class="deleteDivs" style="margin: 0.5%;"
+               [ngClass]="{'selected' : gegenstand.selected, 'unselected': !gegenstand.selected}">
             {{gegenstand.gegenstandName}}
           </div>
         </ng-container>
@@ -171,7 +171,7 @@
       <div class="modal-footer">
         <button [disabled]="!student.studentName || !student.handyNummer"
                 *ngIf="benutzerDatenBool" style="margin-right: 15px"
-                class="btn btn-info" (click)="this.legeBenutzerAn()">
+                class="btn btn-info" (click)="legeBenutzerAn()">
           Weiter
         </button>
         <ng-container *ngIf="ausleihenBool && weiterBool">

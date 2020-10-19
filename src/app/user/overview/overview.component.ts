@@ -36,7 +36,6 @@ export class OverviewComponent implements OnInit {
   benutzerDatenBool: boolean;
   student: Student = new Student();
   weiterBool: boolean;
-  studentFachGegenstandList: Gegenstand[] = [];
   fachToAdd: Fach = new Fach();
   fachToDelete: Fach = new Fach();
   different: boolean = false;
@@ -129,6 +128,7 @@ export class OverviewComponent implements OnInit {
             this.fachListToDisplay[i].category = category;
           }
           this.fachListToDisplay.sort(((a, b) => this.sortByFachName(a.fachName, b.fachName)));
+          this.fachList.sort(((a, b) => this.sortByFachName(a.fachName, b.fachName)));
           this.categoryList2 = JSON.parse(JSON.stringify(this.categoryList1));
           this.categoryList2 = this.categoryList2.filter(
             category => category.categoryName !== "Alle"
@@ -217,11 +217,12 @@ export class OverviewComponent implements OnInit {
   }
 
   updateCurrentFachAndIndex(fachIndex: number) {
-    this.currentFachName = [...this.fachList][fachIndex].fachName;
+    this.currentFachName = this.fachListToDisplay[fachIndex].fachName;
     this.currentFachIndex = fachIndex;
   }
 
   deleteGegenstandListNachMengenAngabe() {
+    console.log(this.currentGegenstandListToDelete);
     for (let i = 0; i < this.currentGegenstandListToDelete.length; i++) {
       if (this.currentGegenstandListToDelete[i].menge === this.initialGegenstandListToDelete[i].menge) {
         this.currentGegenstandListToDelete[i].menge = -1;
@@ -229,7 +230,6 @@ export class OverviewComponent implements OnInit {
     }
     this.currentGegenstandListToDelete = this.currentGegenstandListToDelete.filter(
       gegenstand => gegenstand.menge !== -1);
-
     this.gegenstandService.delete(this.currentGegenstandListToDelete, this.currentFachName).subscribe(
       success => {
         if (success) {
@@ -278,12 +278,15 @@ export class OverviewComponent implements OnInit {
     this.studentService.add(this.student).subscribe(
       success => {
         console.log(success);
-        this.getGegenstandListVonStudent();
+        if (!this.ausleihenBool) {
+          this.getGegenstandListVonStudent();
+        } else {
+          this.setAusleihenList();
+        }
       }, error => {
         console.log(error);
       }
     );
-    this.getGegenstandListVonStudent();
     this.weiterBool = true;
     this.benutzerDatenBool = false;
   }
@@ -292,39 +295,21 @@ export class OverviewComponent implements OnInit {
     if (!gegenstand.ausgeliehen) {
       gegenstand.selected = !gegenstand.selected;
     }
-    this.gegenstandListToAusleihen = [];
-    for (let i = 0; i < this.fachList[this.currentFachIndex].gegenstandList.length; i++) {
-      if (this.fachList[this.currentFachIndex].gegenstandList[i].selected) {
-        this.gegenstandListToAusleihen.push(
-          this.fachList[this.currentFachIndex].gegenstandList[i]);
-      }
-    }
   }
 
-
   addSelectedGegenstandToAbgeben(index: number) {
-    this.studentFachGegenstandList[index].selected = !this.studentFachGegenstandList[index].selected;
-    this.gegenstandListToAbgeben = [];
-    let gegenstand;
-    for (let i = 0; i < this.studentFachGegenstandList.length; i++) {
-      gegenstand = this.studentFachGegenstandList[i];
-      if (gegenstand.selected) {
-        this.gegenstandListToAbgeben.push(gegenstand);
-      }
-    }
+    this.gegenstandListToAbgeben[index].selected = !this.gegenstandListToAbgeben[index].selected;
   }
 
   setGegenstandListsToDelete() {
-    this.currentGegenstandListToDelete =
-      this.fachListToDisplay[this.currentFachIndex].gegenstandList.filter(
-        gegenstand => gegenstand.ausgeliehen === false);
+    this.currentGegenstandListToDelete = this.fachListToDisplay[this.currentFachIndex].gegenstandList;
     this.initialGegenstandListToDelete = JSON.parse(JSON.stringify(
-      this.fachListToDisplay[this.currentFachIndex].gegenstandList.filter(
-        gegenstand => gegenstand.ausgeliehen === false)));
+      this.fachListToDisplay[this.currentFachIndex].gegenstandList));
   }
 
   disableBools() {
-    this.fachList[this.currentFachIndex].gegenstandList.forEach(gegenstand => gegenstand.selected = false);
+    this.fachList[this.currentFachIndex].gegenstandList.forEach(
+      gegenstand => gegenstand.selected = false);
     this.categoryList1.forEach(category => category.selected = false);
     this.categoryList2.forEach(category => category.selected = false);
     this.different = false;
@@ -343,17 +328,22 @@ export class OverviewComponent implements OnInit {
   getGegenstandListVonStudent() {
     this.studentService.get(this.student).subscribe(student => {
       this.student = student;
-      this.studentFachGegenstandList = JSON.parse(JSON.stringify(this.student.gegenstandList)).filter(
+      this.gegenstandListToAbgeben = JSON.parse(JSON.stringify(this.student.gegenstandList)).filter(
         gegenstand1 => this.fachList[this.currentFachIndex].gegenstandList.map(
           gegenstand2 => gegenstand2.gegenstandId).includes(gegenstand1.gegenstandId));
     });
   }
 
+  setAusleihenList() {
+    this.gegenstandListToAusleihen = this.fachList[this.currentFachIndex].gegenstandList;
+  }
+
   ausleihen() {
+    this.gegenstandListToAusleihen = this.gegenstandListToAusleihen.filter(gegenstand => gegenstand.selected);
+    let ids = this.gegenstandListToAusleihen.map(
+      gegenstand => gegenstand.gegenstandId)
     this.auleihenAbgebenService.ausleihen(
-      this.student.studentName, this.student.handyNummer,
-      Array.from(new Set(this.gegenstandListToAusleihen)).map(
-        gegenstand => gegenstand.gegenstandId)
+      this.student.studentName, this.student.handyNummer, ids
     ).subscribe(
       () => {
         this.router.navigate(['overview']);
@@ -361,9 +351,10 @@ export class OverviewComponent implements OnInit {
   }
 
   abgeben() {
+    this.gegenstandListToAbgeben = this.gegenstandListToAbgeben.filter(gegenstand => gegenstand.selected);
+    let ids = this.gegenstandListToAbgeben.map(gegenstand => gegenstand.gegenstandId);
     this.auleihenAbgebenService.abgeben(
-      this.student.studentName, this.student.handyNummer,
-      Array.from(new Set(this.gegenstandListToAbgeben)).map(gegenstand => gegenstand.gegenstandId)).subscribe(
+      this.student.studentName, this.student.handyNummer, ids).subscribe(
       message => {
         this.router.navigate(['overview']);
       }, error => {
@@ -378,7 +369,7 @@ export class OverviewComponent implements OnInit {
 
   keinGegenstandToAbgebenSelektiert(): boolean {
     return JSON.parse(
-      JSON.stringify(this.studentFachGegenstandList)).filter(
+      JSON.stringify(this.gegenstandListToAbgeben)).filter(
       gegenstand => gegenstand.selected).length > 0;
   }
 
